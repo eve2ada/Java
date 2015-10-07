@@ -1,0 +1,28 @@
+//Yi He
+//10/06/2015
+//CSE 143X
+//TA:Rasika Bhalerao
+//HW #2
+//
+//This program will draw a figure
+
+import java.awt.*;
+
+public class Doodle {
+	public static void main(String[] args){
+		DrawingPanel panel = new DrawingPanel(500,500);
+		Color UWPurple = new Color(51, 0, 111);
+		Color UWGold = new Color(145,123,76);
+		Graphics g = panel.getGraphics();
+		
+		g.setColor(UWPurple);
+		g.fillRoundRect(100, 80, 50, 300, 50, 50);
+		g.fillRect(400, 80, 50, 300);
+		g.fillOval(125, 225, 300, 30);
+		
+		g.setColor(UWGold);
+		g.setFont(new Font("Arial", Font.PLAIN, 40)); 
+		g.drawString("Welcome Huskies!", 120, 450);
+	}
+
+}
