@@ -1,0 +1,39 @@
+//Write a program in a class named StarFigure that produces the following output using for loops. 
+/*
+////////////////\\\\\\\\\\\\\\\\
+////////////********\\\\\\\\\\\\
+////////****************\\\\\\\\
+////************************\\\\
+********************************
+ */
+package temp;
+
+public class StarFigure {
+	public static void main(String[] args){
+		for(int i = 0; i <= 4; i++){
+			for(int j = 0; j < 4-i; j++){
+				print4Slash();
+			}
+			for(int j = 0; j < i; j++){
+				print8Star();
+			}
+			for(int j = 0; j < 4-i; j++){
+				print4BSlash();
+			}
+			System.out.println();
+		}
+	}
+	
+	public static void print4Slash(){
+		System.out.print("////");
+	}
+	
+	public static void print4BSlash(){
+		System.out.print("\\\\\\\\");
+	}
+	
+	public static void print8Star(){
+		System.out.print("********");
+	}
+
+}
