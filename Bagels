@@ -1,11 +1,38 @@
+//Yi He
+//10/16/2015
+//CSE 143X
+//TA:Rasika Bhalerao
+//HW #3
+//
+//This program will play a game of Bagels with the user.
 package Bagels;
 import java.util.*;
 
 public class Bagels {
 	
 	public static void main(String[] args){
+		introduce();
 		Scanner console = new Scanner(System.in);
+			
+		char marker = 'y';
+		int counter = 1;
+		while(marker == 'y'){
+			int counter_Guess = play(console);
+			System.out.print("Do you want to play again?");
+			String continue_Play = console.next();
+			if(continue_Play == "y" || continue_Play == "Y"){
+				marker = 'y';
+				counter += 1;
+			}
+			else{
+				marker = 'n';
+				printResult(counter, counter_Guess);
+			}
+		}	
 		
+	}
+	//method to introduce game
+	public static void introduce(){
 		System.out.println("Welcome to CSE 143x Bagels!");
 		System.out.println("I'll think up a number for you to guess.");
 		System.out.println("Each digit will be between 1 and 9.");
@@ -13,10 +40,13 @@ public class Bagels {
 		System.out.println("for each digit you get right and in the right");
 		System.out.println("place, and \"pica\" for each digit you get right");
 		System.out.println("that is in the wrong place.");
-		
 		System.out.println();
+	}
+	
+	//method to play one game
+	public static int play(Scanner console){
 		// get amount of digits from user
-		System.out.println("How many digits this time?");
+		System.out.print("How many digits this time?");
 		int amount = console.nextInt();
 		
 		//generate random number with the amount of digits user input
@@ -24,17 +54,23 @@ public class Bagels {
 		Random r = new Random(42);
 		for (int i = 0; i < amount; i++){
 			correct[i] = r.nextInt();	
-		}	
-		
+		}		
 		// get the guessed number from user
-		System.out.println("Your guess?");
+		System.out.print("Your guess?");
 		int guess = console.nextInt();
 		
 		//compare correct and guess to determine what hint be output
-		compare(correct, guess, amount);
+		int counter_Guess = 1;
+		while(!compare(correct, guess, amount)){
+			counter_Guess += 1;
+			compare(correct, guess, amount);
+		}
+		
+		return counter_Guess;
 	}
 	
-	public static void compare(int[] correct, int guess, int amount){
+	//method to compare correct and guess
+	public static boolean compare(int[] correct, int guess, int amount){
 		//define two arrays for guessed number and comparison result
 		int[] guessArr = new int[amount]; //store array of guessed integer
 		int counter_F = 0; //counter for "fermi" result
@@ -53,10 +89,11 @@ public class Bagels {
 				counter_F += 1;
 				copy[j] = 0; // there is a 'fermi', then mark corresponding digit		
 			}
-			//check if all digits are right
-			if(counter_F == amount){
-				
-			}
+		}
+		
+		//check if all digits are right
+		if(counter_F == amount){
+			return true;
 		}
 		
 		//match 'pica'
@@ -81,6 +118,15 @@ public class Bagels {
 				System.out.print("pica");
 			}
 		}
+	}
+	
+	//method to print out result
+	public static void printResult(int counter, int counter_Guess){
+		System.out.println("Overall results:");
+		System.out.println("   total games = " + counter);
+		System.out.println("   total guesses = " + counter_Guess);
+		System.out.println("   guesses/game = " + round(double(counter_Guess/counter)));
+		System.out.println("   best game = " + counter);
 	}
 
 }
