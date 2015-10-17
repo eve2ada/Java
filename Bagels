@@ -14,10 +14,17 @@ public class Bagels {
 		Scanner console = new Scanner(System.in);			
 		char marker = 'y';
 		int counter = 1;
-		int bestGame = 1;
+		int bestGame = 0; //store smallest guess time
+		int sumGuess = 0; //store all guesses
 		while(marker == 'y'){
 			int counter_Guess = play(console);
+			sumGuess += counter_Guess;
+			System.out.println("counter_Guess = " + counter_Guess);
+			System.out.println("bestGame = " + bestGame);
 			if(counter_Guess > -1){
+				if(bestGame == 0){
+					bestGame = counter_Guess;
+				}
 				if(counter_Guess < bestGame){
 					bestGame = counter_Guess;
 				}
@@ -31,7 +38,7 @@ public class Bagels {
 			}
 			else{
 				marker = 'n';
-				printResult(counter, counter_Guess, bestGame);
+				printResult(counter, counter_Guess, sumGuess, bestGame);
 			}
 		}		
 	}
@@ -55,7 +62,7 @@ public class Bagels {
 		
 		// get amount of digits from user
 		System.out.print("How many digits this time?");
-		int amount = console.nextInt();
+		int amount = console.nextInt();		
 		
 		//generate random number with the amount of digits user input
 		int[] correct = new int[amount];
@@ -80,38 +87,10 @@ public class Bagels {
 			
 			slicing(amount,guess,guessArr);
 			
-			//compare correct and guess to determine what hint be output
+			//compare correct and guess to determine what hint would be output
 			counter_F = compareF(amount, correct, guessArr, copy, counter_F);
 			counter_P = compareP(amount, correct, guessArr, copy, counter_P);
 			
-			System.out.println("correct = " + correct[0] + correct[1] + correct[2]);
-			System.out.println("guessArr = " + guessArr[0] + guessArr[1] + guessArr[2]);
-			System.out.println("copy = " + copy[0] + copy[1] + copy[2]);
-			System.out.println("counter_F = " + counter_F);
-			System.out.println("counter_P = " + counter_P);
-			
-			/*
-			//match 'fermi'
-			for(int j = 0; j < amount; j++){
-				if(correct[j] == guessArr[j]){
-					counter_F += 1;
-					guessArr[j] = -1; //mark 'fermi'ed digit
-					copy[j] = 0; // there is a 'fermi', then mark corresponding digit
-				}
-			}
-					
-			//match 'pica'
-			for(int i = 0; i < amount; i++){
-				for(int j = 0; j < amount; j++){
-					if(copy[i] == guessArr[j]){
-						counter_P += 1; 
-						guessArr[j] = -1;//mark 'pica'ed digit
-						copy[i] = 0;// there is a 'pica', then mark corresponding digit	
-					}
-				}
-			}
-			*/
-
 			//check if all digits are right
 			if(counter_F == amount){
 				//all digits are correct, end this game
@@ -181,11 +160,11 @@ public class Bagels {
 	}
 	
 	//method to print out result
-	public static void printResult(int counter, int counter_Guess, int bestGame){
+	public static void printResult(int counter, int counter_Guess, int sumGuess, int bestGame){
 		System.out.println("Overall results:");
 		System.out.println("   total games = " + counter);
-		System.out.println("   total guesses = " + counter_Guess);
-		System.out.printf("   guesses/game = %.1f\n", ((double)counter_Guess)/counter);
+		System.out.println("   total guesses = " + sumGuess);
+		System.out.printf("   guesses/game = %.1f\n", ((double)sumGuess)/counter);
 		System.out.println("   best game = " + bestGame);
 	}
 
