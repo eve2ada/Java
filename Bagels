@@ -15,17 +15,27 @@ public class Bagels {
 			
 		char marker = 'y';
 		int counter = 1;
+		int bestGame = 1;
 		while(marker == 'y'){
 			int counter_Guess = play(console);
+			if(counter_Guess > -1){
+				if(counter_Guess < bestGame){
+					bestGame = counter_Guess;
+				}
+				System.out.println("You got it right in " + counter_Guess + " guesses");
+			} 
 			System.out.print("Do you want to play again?");
-			String continue_Play = console.next();
-			if(continue_Play == "y" || continue_Play == "Y"){
+			char continue_Play = console.next().charAt(0);
+					
+			System.out.println(continue_Play);
+			
+			if(continue_Play == 'y' || continue_Play == 'Y'){
 				marker = 'y';
 				counter += 1;
 			}
 			else{
 				marker = 'n';
-				printResult(counter, counter_Guess);
+				printResult(counter, counter_Guess, bestGame);
 			}
 		}	
 		
@@ -80,7 +90,6 @@ public class Bagels {
 				guessArr[i] = guess % 10;
 				guess = guess/10;
 			}
-//			System.out.println("guessArr is " + guessArr[0] + guessArr[1] + guessArr[2]);
 			
 			//compare correct and guess to determine what hint be output
 			//match 'fermi'
@@ -108,7 +117,8 @@ public class Bagels {
 				for(int j = 0; j < amount; j++){
 					if(copy[i] == guessArr[j]){
 						counter_P += 1; 
-						copy[i] = 0;// there is a 'pica', then mark corresponding digit					
+						copy[i] = 0;// there is a 'pica', then mark corresponding digit	
+						guessArr[j] = -1;//mark 'pica'ed digit
 					}
 				}
 			}
@@ -129,21 +139,17 @@ public class Bagels {
 				System.out.println();
 			}
 		}
-		return counter_Guess;
+		return -1;
 	}
 	
-	//method to compare correct and guess
-//	public static boolean compare(int[] correct, int guess, int amount){
-		
-//	}
 	
 	//method to print out result
-	public static void printResult(int counter, int counter_Guess){
+	public static void printResult(int counter, int counter_Guess, int bestGame){
 		System.out.println("Overall results:");
 		System.out.println("   total games = " + counter);
 		System.out.println("   total guesses = " + counter_Guess);
-		System.out.println("   guesses/game = " + Math.round((double)(counter_Guess/counter)));
-		System.out.println("   best game = " + counter);
+		System.out.printf("   guesses/game = %.1f\n", ((double)counter_Guess)/counter);
+		System.out.println("   best game = " + bestGame);
 	}
 
 }
