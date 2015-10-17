@@ -11,8 +11,7 @@ import java.util.*;
 public class Bagels {	
 	public static void main(String[] args){
 		introduce();
-		Scanner console = new Scanner(System.in);
-			
+		Scanner console = new Scanner(System.in);			
 		char marker = 'y';
 		int counter = 1;
 		int bestGame = 1;
@@ -25,10 +24,7 @@ public class Bagels {
 				System.out.println("You got it right in " + counter_Guess + " guesses");
 			} 
 			System.out.print("Do you want to play again?");
-			char continue_Play = console.next().charAt(0);
-					
-			System.out.println(continue_Play);
-			
+			char continue_Play = console.next().charAt(0);							
 			if(continue_Play == 'y' || continue_Play == 'Y'){
 				marker = 'y';
 				counter += 1;
@@ -37,9 +33,9 @@ public class Bagels {
 				marker = 'n';
 				printResult(counter, counter_Guess, bestGame);
 			}
-		}	
-		
+		}		
 	}
+	
 	//method to introduce game
 	public static void introduce(){
 		System.out.println("Welcome to CSE 143x Bagels!");
@@ -79,7 +75,7 @@ public class Bagels {
 			int[] copy = new int[amount];
 			System.arraycopy(correct, 0, copy, 0, amount);
 			
-			System.out.println("initial copy is " + copy[0] + copy[1] + copy[2]);
+//			System.out.println("initial copy is " + copy[0] + copy[1] + copy[2]);
 			
 			System.out.print("Your guess? ");
 			int guess = console.nextInt();
@@ -101,8 +97,8 @@ public class Bagels {
 				}
 			}
 			
-			System.out.println("counter_F is "+ counter_F);
-			System.out.println("copy is " + copy[0] + copy[1] + copy[2]);
+//			System.out.println("counter_F is "+ counter_F);
+//			System.out.println("copy is " + copy[0] + copy[1] + copy[2]);
 			
 			//check if all digits are right
 			if(counter_F == amount){
@@ -110,7 +106,7 @@ public class Bagels {
 				return counter_Guess;
 			}
 			
-			System.out.println("guessArr is " + guessArr[0] + guessArr[1] + guessArr[2]);
+//			System.out.println("guessArr is " + guessArr[0] + guessArr[1] + guessArr[2]);
 			
 			//match 'pica'
 			for(int i = 0; i < amount; i++){
@@ -122,26 +118,30 @@ public class Bagels {
 					}
 				}
 			}
-			System.out.println("counter_P is " + counter_P);
-			System.out.println("copy is " + copy[0] + copy[1] + copy[2]);
+//			System.out.println("counter_P is " + counter_P);
+//			System.out.println("copy is " + copy[0] + copy[1] + copy[2]);
 			
-			//check if 'bagels' is needed to output
-			if(counter_F == 0 & counter_P == 0){
-				System.out.println("bagels");
-			}
-			else{
-				for(int i = 1; i <= counter_F; i++){
-					System.out.print("fermi ");
-				}
-				for(int j = 1; j <= counter_P; j++){
-					System.out.print("pica ");
-				}
-				System.out.println();
-			}
+			//determine and output
+			check(counter_F, counter_P);
 		}
 		return -1;
 	}
 	
+	//check if "bagels" or "fermi", "pica" is needed to output
+	public static void check(int counter_F, int counter_P){
+		if(counter_F == 0 & counter_P == 0){
+			System.out.println("bagels");
+		}
+		else{
+			for(int i = 1; i <= counter_F; i++){
+				System.out.print("fermi ");
+			}
+			for(int j = 1; j <= counter_P; j++){
+				System.out.print("pica ");
+			}
+			System.out.println();
+		}
+	}
 	
 	//method to print out result
 	public static void printResult(int counter, int counter_Guess, int bestGame){
