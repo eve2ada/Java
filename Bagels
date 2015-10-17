@@ -1,0 +1,86 @@
+package Bagels;
+import java.util.*;
+
+public class Bagels {
+	
+	public static void main(String[] args){
+		Scanner console = new Scanner(System.in);
+		
+		System.out.println("Welcome to CSE 143x Bagels!");
+		System.out.println("I'll think up a number for you to guess.");
+		System.out.println("Each digit will be between 1 and 9.");
+		System.out.println("Try to guess my number, and I'll say \"fermi\"");
+		System.out.println("for each digit you get right and in the right");
+		System.out.println("place, and \"pica\" for each digit you get right");
+		System.out.println("that is in the wrong place.");
+		
+		System.out.println();
+		// get amount of digits from user
+		System.out.println("How many digits this time?");
+		int amount = console.nextInt();
+		
+		//generate random number with the amount of digits user input
+		int[] correct = new int[amount];
+		Random r = new Random(42);
+		for (int i = 0; i < amount; i++){
+			correct[i] = r.nextInt();	
+		}	
+		
+		// get the guessed number from user
+		System.out.println("Your guess?");
+		int guess = console.nextInt();
+		
+		//compare correct and guess to determine what hint be output
+		compare(correct, guess, amount);
+	}
+	
+	public static void compare(int[] correct, int guess, int amount){
+		//define two arrays for guessed number and comparison result
+		int[] guessArr = new int[amount]; //store array of guessed integer
+		int counter_F = 0; //counter for "fermi" result
+		int counter_P = 0; //counter for "pica" result
+		int[] copy = correct;//work as a marker, when get "fermi" or "pica", change corresponding digit to 0 
+		
+		//slicing the guessed integer into array
+		for(int i = amount - 1; i >= 0; i--){
+			guessArr[i] = guess % 10;
+			guess = guess/10;
+		}
+		
+		//compare two arrays and output--match 'fermi'
+		for(int j = 0; j < amount; j++){
+			if(correct[j] == guessArr[j]){
+				counter_F += 1;
+				copy[j] = 0; // there is a 'fermi', then mark corresponding digit		
+			}
+			//check if all digits are right
+			if(counter_F == amount){
+				
+			}
+		}
+		
+		//match 'pica'
+		for(int i = 0; i < amount; i++){
+			for(int j = 0; j < amount; j++){
+				if(correct[i] == guessArr[j]){
+					counter_P += 1; 
+					copy[i] = 0;// there is a 'pica', then mark corresponding digit					
+				}
+			}
+		}
+		
+		//check if 'bagels' is needed to output
+		if(counter_F == 0 & counter_P == 0){
+			System.out.println("bagels");
+		}
+		else{
+			for(int i = 1; i <= counter_F; i++){
+				System.out.print("fermi");
+			}
+			for(int j = 1; j <= counter_P; j++){
+				System.out.print("pica");
+			}
+		}
+	}
+
+}
