@@ -1,0 +1,170 @@
+package Bagels;
+import java.util.*;
+import java.io.*;
+
+public class BagelsSolver {
+	public static void main(String[] args) throws IOException{
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in)); 
+		
+		String s;
+		int counter_F = 0;
+		int counter_P = 0;
+		int amount = generateAmount();
+		int[] guess = new int[amount];
+		while((s = br.readLine()) != null){
+			if(s == "How many digits this time? "){
+				System.out.println(amount);	
+				break;
+			}
+			//count if current line has "bagels","fermi", or "pica"
+			count(s, counter_F, counter_P);
+			
+			while(s == "Your guess? "){
+				if(counter_F == 0 & counter_P == 0){
+					guess = generateRandom(amount);
+				}
+				else if(counter_F + counter_P == amount){
+					guess = generateGuess1(guess, amount, counter_F);
+				}
+				else{
+					guess = generateGuess2(guess, amount, counter_F);
+				}
+				s = br.readLine();
+			}
+			
+			while(s == "Do you want to play again?"){
+				System.out.println('n');
+			}
+		}
+	}
+	
+	//generate random amount of digits to be guessed 
+	public static int generateAmount(){
+		Random r = new Random();
+		int amount = r.nextInt(Integer.MAX_VALUE) + 1;
+		return amount;	
+	}
+	
+	//generate random integer(guess) of given amount of digits
+	public static int[] generateRandom(int amount){
+		Random r = new Random();
+		int[] guess = new int[amount];
+		for(int i = 0; i < amount; i++){
+			guess[i] = r.nextInt(10);
+		}
+		
+		int combination = combineDigits(guess, amount);
+		System.out.println(combination);
+		return guess;
+	}
+	//generate randomly given amount of digits in guessed integer(F+P=amount)
+	public static int[] generateGuess1(int[] guess, int amount, int counter_F){
+		int[] ix = new int[counter_F];//assume digits with these indice are "fermi"
+		Random r = new Random();
+		for(int i = 0; i < counter_F; i++){
+			ix[i] = r.nextInt(amount);
+		}
+		//fix these assumed 'fermi' digits, change other digits' sequence
+			for(int i = 0; i < amount - 2; i++){
+				if(!(Arrays.asList(ix).contains(i))){
+					int n = 1;
+					while(!(Arrays.asList(ix).contains(i+n))){
+						n += 1;
+					}
+						int temp = guess[i];
+						guess[i] = guess[i+n];
+						guess[i+n] = temp;
+				}
+			}
+			//deal with the last element separately
+			if(!(Arrays.asList(ix).contains(amount-1))){
+				int n = 0;
+				while(!(Arrays.asList(ix).contains(n))){
+					n += 1;
+				}
+					int temp = guess[amount-1];
+					guess[amount-1] = guess[n];
+					guess[0] = temp;
+			}
+		int combination = combineDigits(guess, amount);
+		System.out.println(combination);
+		return guess;
+	}
+	
+	//generate randomly given amount of digits in guessed integer(P = 0 or > 0)
+	public static int[] generateGuess2(int[] guess, int amount, int counter_F){
+		int[] ix = new int[counter_F];//assume digits with these indice are "fermi"
+		int[] other = new int[amount - counter_F];
+		Random r = new Random();
+		for(int i = 0; i < counter_F; i++){
+			ix[i] = r.nextInt(amount);
+		}
+		//fix these assumed 'fermi' digits, change all other digits
+		int i = 0;
+		for(int j = 0; j < amount - counter_F; j++){
+			while(Arrays.asList(ix).contains(i)){
+				i += 1;
+			}
+			other[j] = guess[i];
+			i += 1;
+		}
+		
+		for(i = 0; i < amount; i++){
+			if(!(Arrays.asList(ix).contains(i))){
+				//generate a random number other than current 'pica' digits
+				int temp = r.nextInt(10);
+				while(Arrays.asList(other).contains(temp)){
+					temp = r.nextInt(10);
+				}
+				guess[i] = temp;
+			}
+		}
+		
+		int combination = combineDigits(guess, amount);
+		System.out.println(combination);
+		return guess;
+	}
+	
+	//combine digits to one integer
+	public static int combineDigits(int[] guess, int amount){
+		int combination = 0;
+		for(int i = amount - 1; i >= 0; i--){
+			combination += guess[i]*(10^(amount - i - 1));
+		}
+		return combination;
+	}
+	
+	//count "fermi" and "pica" in output
+	public static void count(String s, int counter_F, int counter_P){
+		int temp = 0; //temp counter
+		int ix = s.indexOf("bagels");
+		if(ix != -1){
+			counter_F = 0;
+			counter_P = 0;
+		}
+		else{
+			//count "fermi"
+			ix = 0;
+			while(ix != -1){
+				ix = s.indexOf("fermi");
+				if(ix != -1){
+					temp += 1;
+					ix += "fermi".length();
+				}
+			}
+			counter_F = temp;
+			
+			//count "pica"
+			ix = 0;
+			temp = 0;
+			while(ix != -1){
+				ix = s.indexOf("pica");
+				if(ix != -1){
+					temp += 1;
+					ix += "pica".length();
+				}
+			}			
+			counter_P = temp;			
+		}		
+	}
+}
