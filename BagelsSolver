@@ -5,21 +5,21 @@ import java.io.*;
 public class BagelsSolver {
 	public static void main(String[] args) throws IOException{
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in)); 
-		
 		String s;
 		int counter_F = 0;
 		int counter_P = 0;
 		int amount = generateAmount();
 		int[] guess = new int[amount];
 		while((s = br.readLine()) != null){
-			if(s == "How many digits this time? "){
-				System.out.println(amount);	
-				break;
+//			System.out.print(s);
+			if(s.equals("How many digits this time? ")){
+				System.out.print(amount);	
+				continue;
 			}
 			//count if current line has "bagels","fermi", or "pica"
 			count(s, counter_F, counter_P);
 			
-			while(s == "Your guess? "){
+			if(s.equals("Your guess? ")){
 				if(counter_F == 0 & counter_P == 0){
 					guess = generateRandom(amount);
 				}
@@ -29,7 +29,7 @@ public class BagelsSolver {
 				else{
 					guess = generateGuess2(guess, amount, counter_F);
 				}
-				s = br.readLine();
+//				s = br.readLine();
 			}
 			
 			while(s == "Do you want to play again?"){
@@ -41,7 +41,8 @@ public class BagelsSolver {
 	//generate random amount of digits to be guessed 
 	public static int generateAmount(){
 		Random r = new Random();
-		int amount = r.nextInt(Integer.MAX_VALUE) + 1;
+		int amount = r.nextInt(4) + 1;
+		System.out.println("amount = " + amount);
 		return amount;	
 	}
 	
@@ -49,7 +50,8 @@ public class BagelsSolver {
 	public static int[] generateRandom(int amount){
 		Random r = new Random();
 		int[] guess = new int[amount];
-		for(int i = 0; i < amount; i++){
+		guess[0] = r.nextInt(9) + 1;
+		for(int i = 1; i < amount; i++){
 			guess[i] = r.nextInt(10);
 		}
 		
@@ -129,7 +131,8 @@ public class BagelsSolver {
 	public static int combineDigits(int[] guess, int amount){
 		int combination = 0;
 		for(int i = amount - 1; i >= 0; i--){
-			combination += guess[i]*(10^(amount - i - 1));
+			combination += guess[i]*(Math.pow(10, amount - i - 1));
+			System.out.println(guess[i] + " : " + (amount - i - 1));
 		}
 		return combination;
 	}
