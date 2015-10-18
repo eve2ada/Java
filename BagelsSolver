@@ -3,37 +3,43 @@ import java.util.*;
 import java.io.*;
 
 public class BagelsSolver {
+	private static int counter_F = 0;
+	private static int counter_P = 0;
 	public static void main(String[] args) throws IOException{
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in)); 
 		String s;
-		int counter_F = 0;
-		int counter_P = 0;
+
 		int amount = generateAmount();
 		int[] guess = new int[amount];
 		while((s = br.readLine()) != null){
-//			System.out.print(s);
+			System.out.print(s);
 			if(s.equals("How many digits this time? ")){
 				System.out.print(amount);	
 				continue;
 			}
-			//count if current line has "bagels","fermi", or "pica"
-			count(s, counter_F, counter_P);
 			
 			if(s.equals("Your guess? ")){
 				if(counter_F == 0 & counter_P == 0){
-					guess = generateRandom(amount);
+					guess = generateRandom(amount);//no matched digit, generate all randomly
 				}
 				else if(counter_F + counter_P == amount){
-					guess = generateGuess1(guess, amount, counter_F);
+					guess = generateGuess1(guess, amount);
 				}
 				else{
-					guess = generateGuess2(guess, amount, counter_F);
+					guess = generateGuess2(guess, amount);
 				}
+
 //				s = br.readLine();
 			}
 			
-			while(s == "Do you want to play again?"){
+			if(s.contains("bagels") || s.contains("fermi") || s.contains("pica")){
+				//count how many "bagels","fermi", or "pica" in current line
+				System.out.println("here");
+				count(s);
+			}
+			if(s.equals("Do you want to play again?")){
 				System.out.println('n');
+				break;
 			}
 		}
 	}
@@ -60,7 +66,7 @@ public class BagelsSolver {
 		return guess;
 	}
 	//generate randomly given amount of digits in guessed integer(F+P=amount)
-	public static int[] generateGuess1(int[] guess, int amount, int counter_F){
+	public static int[] generateGuess1(int[] guess, int amount){
 		int[] ix = new int[counter_F];//assume digits with these indice are "fermi"
 		Random r = new Random();
 		for(int i = 0; i < counter_F; i++){
@@ -94,7 +100,7 @@ public class BagelsSolver {
 	}
 	
 	//generate randomly given amount of digits in guessed integer(P = 0 or > 0)
-	public static int[] generateGuess2(int[] guess, int amount, int counter_F){
+	public static int[] generateGuess2(int[] guess, int amount){
 		int[] ix = new int[counter_F];//assume digits with these indice are "fermi"
 		int[] other = new int[amount - counter_F];
 		Random r = new Random();
@@ -137,10 +143,13 @@ public class BagelsSolver {
 		return combination;
 	}
 	
-	//count "fermi" and "pica" in output
-	public static void count(String s, int counter_F, int counter_P){
+	//count "bagels" "fermi" and "pica" in output, update counter_F and counter_P
+	public static void count(String s){
 		int temp = 0; //temp counter
 		int ix = s.indexOf("bagels");
+		
+//		System.out.println("bagels begin " + ix);
+		
 		if(ix != -1){
 			counter_F = 0;
 			counter_P = 0;
@@ -148,26 +157,28 @@ public class BagelsSolver {
 		else{
 			//count "fermi"
 			ix = 0;
-			while(ix != -1){
-				ix = s.indexOf("fermi");
+			while(ix < s.length() & ix != -1){
+				ix = s.indexOf("fermi", ix);
 				if(ix != -1){
 					temp += 1;
 					ix += "fermi".length();
 				}
 			}
 			counter_F = temp;
+			System.out.println("in count, counter_F = " + counter_F);
 			
 			//count "pica"
 			ix = 0;
 			temp = 0;
-			while(ix != -1){
-				ix = s.indexOf("pica");
+			while(ix < s.length() & ix != -1){
+				ix = s.indexOf("pica", ix);
 				if(ix != -1){
 					temp += 1;
 					ix += "pica".length();
 				}
 			}			
-			counter_P = temp;			
+			counter_P = temp;
+			System.out.println("in count, counter_P = " + counter_P);
 		}		
 	}
 }
