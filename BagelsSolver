@@ -3,8 +3,11 @@ import java.util.*;
 import java.io.*;
 
 public class BagelsSolver {
+	public static final int AMOUNT_DIGITS = 4;//number of digits in integer to be guessed
+	
 	private static int counter_F = 0;
 	private static int counter_P = 0;
+	
 	public static void main(String[] args) throws IOException{
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in)); 
 		String s;
@@ -20,21 +23,21 @@ public class BagelsSolver {
 			
 			if(s.equals("Your guess? ")){
 				if(counter_F == 0 & counter_P == 0){
-					guess = generateRandom(amount);//no matched digit, generate all randomly
+					//no matched digit, generate all digits randomly
+					guess = generateRandom(amount);
 				}
 				else if(counter_F + counter_P == amount){
+					//all digits are right, just some of them in wrong locations
 					guess = generateGuess1(guess, amount);
 				}
 				else{
+					//some digits are right, others are wrong
 					guess = generateGuess2(guess, amount);
 				}
-
-//				s = br.readLine();
 			}
 			
 			if(s.contains("bagels") || s.contains("fermi") || s.contains("pica")){
 				//count how many "bagels","fermi", or "pica" in current line
-				System.out.println("here");
 				count(s);
 			}
 			if(s.equals("Do you want to play again?")){
@@ -47,8 +50,7 @@ public class BagelsSolver {
 	//generate random amount of digits to be guessed 
 	public static int generateAmount(){
 		Random r = new Random();
-		int amount = r.nextInt(4) + 1;
-		System.out.println("amount = " + amount);
+		int amount = r.nextInt(AMOUNT_DIGITS) + 1;
 		return amount;	
 	}
 	
@@ -79,9 +81,10 @@ public class BagelsSolver {
 					while(!(Arrays.asList(ix).contains(i+n))){
 						n += 1;
 					}
-						int temp = guess[i];
-						guess[i] = guess[i+n];
-						guess[i+n] = temp;
+					//change every wrong digit with next wrong digit
+					int temp = guess[i];
+					guess[i] = guess[i+n];
+					guess[i+n] = temp;
 				}
 			}
 			//deal with the last element separately
@@ -90,9 +93,10 @@ public class BagelsSolver {
 				while(!(Arrays.asList(ix).contains(n))){
 					n += 1;
 				}
-					int temp = guess[amount-1];
-					guess[amount-1] = guess[n];
-					guess[0] = temp;
+				//change last wrong digit with first wrong digit
+				int temp = guess[amount-1];
+				guess[amount-1] = guess[n];
+				guess[n] = temp;
 			}
 		int combination = combineDigits(guess, amount);
 		System.out.println(combination);
@@ -136,9 +140,8 @@ public class BagelsSolver {
 	//combine digits to one integer
 	public static int combineDigits(int[] guess, int amount){
 		int combination = 0;
-		for(int i = amount - 1; i >= 0; i--){
+		for(int i = 0; i < amount; i++){
 			combination += guess[i]*(Math.pow(10, amount - i - 1));
-			System.out.println(guess[i] + " : " + (amount - i - 1));
 		}
 		return combination;
 	}
@@ -147,8 +150,6 @@ public class BagelsSolver {
 	public static void count(String s){
 		int temp = 0; //temp counter
 		int ix = s.indexOf("bagels");
-		
-//		System.out.println("bagels begin " + ix);
 		
 		if(ix != -1){
 			counter_F = 0;
@@ -165,7 +166,6 @@ public class BagelsSolver {
 				}
 			}
 			counter_F = temp;
-			System.out.println("in count, counter_F = " + counter_F);
 			
 			//count "pica"
 			ix = 0;
@@ -178,7 +178,7 @@ public class BagelsSolver {
 				}
 			}			
 			counter_P = temp;
-			System.out.println("in count, counter_P = " + counter_P);
 		}		
 	}
+	
 }
