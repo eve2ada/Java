@@ -5,7 +5,6 @@
 //HW #3
 //
 //This program will play a game of Bagels with the user.
-package Bagels;
 import java.util.*;
 
 public class Bagels {	
@@ -18,7 +17,7 @@ public class Bagels {
 		int sumGuess = 0; //store all guesses
 		
 		while(marker == 'y'){
-			int counter_Guess = play(console);
+			int counter_Guess = play(console); //play one game and return the guess times
 			sumGuess += counter_Guess;
 			if(counter_Guess > -1){
 				if(bestGame == 0 || counter_Guess < bestGame){
@@ -76,16 +75,16 @@ public class Bagels {
 			counter_Guess += 1;
 			counter_F = 0;
 			int counter_P = 0; //counter for "pica" result
-			//marker, change corresponding digit to 0 when get "fermi" or "pica"
+			//change corresponding digit to 0 when get "fermi" or "pica"
 			int[] copy = new int[amount];
-			System.arraycopy(correct, 0, copy, 0, amount); //generate new copy of correct
+			System.arraycopy(correct, 0, copy, 0, amount); //generate temp copy of correct
 			
 			System.out.print("Your guess? ");
 			int guess = console.nextInt();
 			
 			//slicing the guessed integer into array
 			int[] guessArr = new int[amount]; //store array of guessed integer		
-			slicing(amount,guess,guessArr);
+			slicing(amount, guess, guessArr); //slice input integer and form array
 			
 			//compare correct and guess to determine what hint would be output
 			counter_F = compareF(amount, correct, guessArr, copy, counter_F);
@@ -102,7 +101,7 @@ public class Bagels {
 		return -1;
 	}
 	
-	//generate random number with the amount of digits user input
+	//method to generate random number with the amount of digits user input
 	public static void generateRandom(int[] correct, int amount){
 		Random r = new Random(42);
 		for (int i = 0; i < amount; i++){
@@ -110,7 +109,7 @@ public class Bagels {
 		}
 	}
 	
-	//slicing the guessed integer into array
+	//method to slice the guessed integer into array
 	public static void slicing(int amount, int guess, int[] guessArr){
 		for(int i = amount - 1; i >= 0; i--){
 			guessArr[i] = guess % 10;
@@ -118,14 +117,14 @@ public class Bagels {
 		}
 	}
 	
-	//compare correct and guess to determine what hint be output
+	//method to compare correct and guess to determine what hint be output
 	//match 'fermi'
 	public static int compareF(int amount, int[] correct, int[] guessArr, int[] copy, int counter_F){
 		for(int j = 0; j < amount; j++){
 			if(correct[j] == guessArr[j]){
 				counter_F += 1;
 				guessArr[j] = -1; //mark 'fermi'ed digit
-				copy[j] = 0; // there is a 'fermi', then mark corresponding digit
+				copy[j] = 0; // there is a 'fermi', then mark corresponding digit in copy array
 			}
 		}
 		return counter_F;
@@ -145,7 +144,7 @@ public class Bagels {
 		return counter_P;
 	}
 	
-	//check if "bagels" or "fermi", "pica" is needed to output
+	//method to check if "bagels" or "fermi", "pica" is needed to output
 	public static void check(int counter_F, int counter_P){
 		if(counter_F == 0 & counter_P == 0){
 			System.out.println("bagels");
