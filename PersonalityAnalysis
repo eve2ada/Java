@@ -1,0 +1,42 @@
+//Yi He
+//10/20/2015
+//CSE 143X
+//TA:Rasika Bhalerao
+//HW #4
+//
+//This program will reveal something interesting about the class data
+import java.awt.*;
+import java.io.*;
+import java.util.*;
+
+public class PersonalityAnalysis {
+	public static final int WIDTH = 1000;
+	public static final int HEIGHT = 500;
+	
+	public static void main(String[] args) throws FileNotFoundException{
+		//import and read file
+		File surveyFile = new File("E:/Temp/Java/HW4/src/bigdata.txt");
+		Scanner survey = new Scanner(surveyFile);
+		
+		//draw the panel----or just output to file
+		DrawingPanel panel = new DrawingPanel(WIDTH, HEIGHT);
+		panel.setBackground(Color.GRAY);
+		Graphics g = panel.getGraphics();
+		
+		//survey result analysis
+		//group people by gender, (intended) major, color, favorite activity, section
+		//draw histograms by gender
+		
+		//draw histograms by sections
+		
+		
+		//calculate statistics of survey result by groups
+		//most favorite color by CSE 143X
+		//most favorite activities by CSE 143X 
+		//most (intended) majors
+		//output analysis result to file		
+	}
+	
+	public static 
+
+}
