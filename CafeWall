@@ -9,6 +9,9 @@
 import java.awt.*;
 
 public class CafeWall {
+	//define the gap between rows
+	public static final int MORTAR = 2;
+	
 	public static void main(String[] args){
 		// set the panel and background
 		DrawingPanel panel = new DrawingPanel(650, 400);
@@ -16,36 +19,31 @@ public class CafeWall {
 		Graphics g = panel.getGraphics();
 		
 		//draw upper left row
-		DrawRow(0, 0, 4, 20, g);		
+		drawRow(0, 0, 4, 20, g);		
 		//draw middle left row
-		DrawRow(50,70,5,30,g);
+		drawRow(50,70,5,30,g);
 		
 		//draw lower left grid
-		DrawGrid(10,150,4,25,g,0);
+		drawGrid(10,150,4,25,g,0);
 		
 		//draw upper right grid
-		DrawGrid(400,20,2,35,g,35);
+		drawGrid(400,20,2,35,g,35);
 		
 		//draw lower middle grid
-		DrawGrid(250,200,3,25,g,10);
+		drawGrid(250,200,3,25,g,10);
 		
 		//draw lower right grid
-		DrawGrid(425,180,5,20,g,10);
+		drawGrid(425,180,5,20,g,10);
 	}
 	
 	//method to draw one row
-	public static void DrawRow(int x, int y, int numPairs, int size, Graphics g){
-		//check if numPairs is valid
-		if (numPairs < 1){
-			throw new IllegalArgumentException("numPairs is not valid");
-		}
-		
+	public static void drawRow(int x, int y, int numPairs, int size, Graphics g){
 		//draw a row
 		for(int i = 1; i <= numPairs; i++){
 			//draw one black box
 			g.setColor(Color.BLACK);
 			g.fillRect(x+(i-1)*2*size, y, size, size);
-			
+			 
 			//draw blue X in black box
 			g.setColor(Color.BLUE);
 			g.drawLine(x+(i-1)*2*size, y, x+(i-1)*2*size+size, y+size);
@@ -59,18 +57,13 @@ public class CafeWall {
 	}
 	
 	//method to draw one grid
-	public static void DrawGrid(int x, int y, int numPairs, int size, Graphics g, int offset){
-		//check if numPairs if valid
-		if (numPairs < 1){
-			throw new IllegalArgumentException("numPairs is not valid");
-		}
-		
+	public static void drawGrid(int x, int y, int numPairs, int size, Graphics g, int offset){
 		//draw a grid
 		for(int j = 1; j <= numPairs; j++){
 			//draw the first row
-			DrawRow(x,y+(j-1)*2*size+4*(j-1),numPairs,size,g);
+			drawRow(x,y+(j-1)*2*size+4*(j-1),numPairs,size,g);
 			//draw the second row
-			DrawRow(x+offset,y+(j-1)*2*size+4*(j-1)+size+2,numPairs,size,g);
+			drawRow(x+offset,y+(j-1)*2*size+4*(j-1)+size+MORTAR,numPairs,size,g);
 		}
 	}
 
