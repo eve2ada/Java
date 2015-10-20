@@ -16,6 +16,7 @@ public class Personality {
 		File surveyFile = new File("E:/Temp/Java/HW4/src/temp.txt");
 		Scanner survey = new Scanner(surveyFile);
 		int counter_line = 0; // a counter to record current line number
+		PrintStream output = new PrintStream(new File("result.txt")); //output file
 		
 		while(survey.hasNextLine()){
 			String line = survey.nextLine();
@@ -39,7 +40,8 @@ public class Personality {
 				//generate output combination and result
 				String  result = output(counter_EI, counter_SN, counter_TF, counter_JP);	
 				//output personality type
-				System.out.println(result);
+//				System.out.println(result);
+				output.println(result);
 			}
 		}
 	}
