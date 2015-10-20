@@ -10,13 +10,15 @@ import java.util.*;
 
 public class Personality {
 	public static final int DIMENSION = 4; //dimension of test
+	public static final int SURVEYS = 70;//survey questions
 	
 	public static void main(String[] args) throws FileNotFoundException {
 		//import and read file
-		File surveyFile = new File("E:/Temp/Java/HW4/src/temp.txt");
+		File surveyFile = new File("E:/Temp/Java/HW4/src/bigdata.txt");
 		Scanner survey = new Scanner(surveyFile);
-		int counter_line = 0; // a counter to record current line number
+		
 		PrintStream output = new PrintStream(new File("result.txt")); //output file
+		int counter_line = 0; // a counter to record current line number
 		
 		while(survey.hasNextLine()){
 			String line = survey.nextLine();
@@ -40,7 +42,6 @@ public class Personality {
 				//generate output combination and result
 				String  result = output(counter_EI, counter_SN, counter_TF, counter_JP);	
 				//output personality type
-//				System.out.println(result);
 				output.println(result);
 			}
 		}
@@ -51,11 +52,11 @@ public class Personality {
 		int num_A = 0;
 		int num_B = 0;
 		
-		for(int i = start; i <= line.length() + start - 7; i += 7){
-			if(line.toLowerCase().substring(i, i+1).charAt(0) == 'a'){
+		for(int i = start; i <= SURVEYS + start - 7; i += 7){
+			if(line.toLowerCase().charAt(i) == 'a'){
 				num_A ++;
 			}
-			else if(line.toLowerCase().substring(i, i+1).charAt(0) == 'b'){
+			else if(line.toLowerCase().charAt(i) == 'b'){
 				num_B ++;
 			}
 		}
