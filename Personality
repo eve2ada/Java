@@ -1,0 +1,116 @@
+//Yi He
+//10/20/2015
+//CSE 143X
+//TA:Rasika Bhalerao
+//HW #4
+//
+//This program will read in personality data and outputs an analysis into a file
+import java.io.*;
+import java.util.*;
+
+public class Personality {
+	public static final int DIMENSION = 4; //dimension of test
+	
+	public static void main(String[] args) throws FileNotFoundException {
+		//import and read file
+		File surveyFile = new File("E:/Temp/Java/HW4/src/temp.txt");
+		Scanner survey = new Scanner(surveyFile);
+		int counter_line = 0; // a counter to record current line number
+		
+		while(survey.hasNextLine()){
+			String line = survey.nextLine();
+			counter_line ++;
+			
+			//start from person name line
+			if(counter_line%2 == 1){
+				output.print(line + ": ");
+				line = survey.nextLine();
+				counter_line ++;
+				//count A and B by dimension
+				//Extrovert/Introvert
+				int[] counter_EI = count(line, 0);
+				//Sensing/iNtuition
+				int[] counter_SN = combine(line, 1, 2);
+				//Thinking/Feeling
+				int[] counter_TF = combine(line, 3, 4);
+				//Judging/Perceiving
+				int[] counter_JP = combine(line, 5, 6);
+		
+				//generate output combination and result
+				String  result = output(counter_EI, counter_SN, counter_TF, counter_JP);	
+				//output personality type
+				System.out.println(result);
+			}
+		}
+	}
+	
+	//method to count A and B in one dimension
+	public static int[] count(String line, int start){
+		int num_A = 0;
+		int num_B = 0;
+		
+		for(int i = start; i <= line.length() + start - 7; i += 7){
+			if(line.toLowerCase().substring(i, i+1).charAt(0) == 'a'){
+				num_A ++;
+			}
+			else if(line.toLowerCase().substring(i, i+1).charAt(0) == 'b'){
+				num_B ++;
+			}
+		}
+		
+		return new int[] {num_A, num_B};
+	}
+	
+	//method to combine counters in S/N, T/F, J/P dimension
+	public static int[] combine(String line, int i, int j){
+		int[] counter1 = count(line, i);
+		int[] counter2 = count(line, j);
+		int[] counter = {counter1[0] + counter2[0], counter1[1] + counter2[1]};
+		
+		return counter;
+	}
+	
+	//method to calculate B percentage
+	public static int calPercentage(int[] counter){
+		float percentage = ((float)counter[1])/(counter[0] + counter[1]);
+		int percent = (int) Math.round(percentage * 100);
+//		System.out.println(percent);
+		return percent;
+	}
+	
+	//method to generate 4 B percentages as output, like [90, 15, 10, 10] = ISTJ
+	public static String output(int[] counter_EI, int[] counter_SN, int[] counter_TF, int[] counter_JP){
+		int[] percentage = new int[DIMENSION]; // array to store percentages of 4 dimensions  
+		percentage[0] = calPercentage(counter_EI);
+		percentage[1] = calPercentage(counter_SN);		
+		percentage[2] = calPercentage(counter_TF);		
+		percentage[3] = calPercentage(counter_JP);
+		
+		String result_dimension = "";//string to store result
+		
+		result_dimension += convert(percentage[0], "EI");
+		result_dimension += convert(percentage[1], "SN");
+		result_dimension += convert(percentage[2], "TF");
+		result_dimension += convert(percentage[3], "JP");		
+	
+		String result = "[" + percentage[0] + ", " + percentage[1] + ", " + percentage[2] 
+				+ ", " + percentage[3] + "] = " + result_dimension ;
+		return result;
+	}
+	
+	//method to convert from percentage to category
+	public static String convert(int percentage, String s){
+		String result = "";
+		if(percentage > 50){
+			result = s.substring(1,2);
+		}
+		else if(percentage < 50){
+			result = s.substring(0,1);
+		}
+		else{
+			result = "X";
+		}
+		return result;
+	}
+	
+}
