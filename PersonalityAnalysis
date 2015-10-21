@@ -13,18 +13,26 @@ public class PersonalityAnalysis {
 	public static final int WIDTH = 1000;
 	public static final int HEIGHT = 500;
 	
-	public static void main(String[] args) throws FileNotFoundException{
-		//import and read file
-		File surveyFile = new File("E:/Temp/Java/HW4/src/bigdata.txt");
-		Scanner survey = new Scanner(surveyFile);
+	public static final int DIMENSION = 4; //dimension of test
+	public static final int SURVEYS = 70;//survey questions
+	
+	public static void main(String[] args) throws FileNotFoundException{		
+		//generate result file
+		generateResult();
+			
+		//survey result analysis
+		//group people by gender, (intended) major, color, favorite activity, section
+		File resultFile = new File("result.txt");
+		Scanner typeResult = new Scanner(resultFile);
+		while(typeResult.hasNextLine()){
+			
+		}
 		
+		//draw plots
 		//draw the panel----or just output to file
 		DrawingPanel panel = new DrawingPanel(WIDTH, HEIGHT);
 		panel.setBackground(Color.GRAY);
 		Graphics g = panel.getGraphics();
-		
-		//survey result analysis
-		//group people by gender, (intended) major, color, favorite activity, section
 		//draw histograms by gender
 		
 		//draw histograms by sections
@@ -37,6 +45,127 @@ public class PersonalityAnalysis {
 		//output analysis result to file		
 	}
 	
-	public static 
+	//nested class for information of one surveyor
+	public static class surveyor{
+		
+	}
+	
+	//method to generate result file
+	public static void generateResult() throws FileNotFoundException{
+		//read and analyze data file
+		File surveyFile = new File("E:/Temp/Java/HW4/src/bigdata.txt");
+		Scanner survey = new Scanner(surveyFile);
+		
+		PrintStream output = new PrintStream(new File("result.txt")); //output file
+		int counter_line = 0; // a counter to record current line number
+		
+		//get type information of each people
+		while(survey.hasNextLine()){
+			String line = survey.nextLine();
+			counter_line ++;
+			
+			//start from person name line
+			if(counter_line%2 == 0){
+//				output.print(line + " "); //no need to keep name
+//				line = survey.nextLine();
+//				counter_line ++;
+				//count A and B by dimension
+				//Extrovert/Introvert
+				int[] counter_EI = count(line, 0);
+				//Sensing/iNtuition
+				int[] counter_SN = combine(line, 1, 2);
+				//Thinking/Feeling
+				int[] counter_TF = combine(line, 3, 4);
+				//Judging/Perceiving
+				int[] counter_JP = combine(line, 5, 6);
+		
+				//generate output combination and result
+				String  result_dimension = output(counter_EI, counter_SN, counter_TF, counter_JP);	
+				//output personality type
+				output.print(result_dimension);
+				//output other information(gender, section, color, etc.)
+				output.println(line.substring(SURVEYS));
+			}
+		}
+	}
+	
+	//method to count A and B in one dimension
+	public static int[] count(String line, int start){
+		int num_A = 0;
+		int num_B = 0;
+		
+		for(int i = start; i <= SURVEYS + start - 7; i += 7){
+			if(line.toLowerCase().charAt(i) == 'a'){
+				num_A ++;
+			}
+			else if(line.toLowerCase().charAt(i) == 'b'){
+				num_B ++;
+			}
+		}
+		
+		return new int[] {num_A, num_B};
+	}
+	
+	//method to combine counters in S/N, T/F, J/P dimension
+	public static int[] combine(String line, int i, int j){
+		int[] counter1 = count(line, i);
+		int[] counter2 = count(line, j);
+		int[] counter = {counter1[0] + counter2[0], counter1[1] + counter2[1]};
+		
+		return counter;
+	}
+	
+	//method to calculate B percentage
+	public static int calPercentage(int[] counter){
+		float percentage = ((float)counter[1])/(counter[0] + counter[1]);
+		int percent = (int) Math.round(percentage * 100);
+//		System.out.println(percent);
+		return percent;
+	}
+	
+	//method to generate type as output, like ISTJ
+	public static String output(int[] counter_EI, int[] counter_SN, int[] counter_TF, int[] counter_JP){
+		int[] percentage = new int[DIMENSION]; // array to store percentages of 4 dimensions  
+		percentage[0] = calPercentage(counter_EI);
+		percentage[1] = calPercentage(counter_SN);		
+		percentage[2] = calPercentage(counter_TF);		
+		percentage[3] = calPercentage(counter_JP);
+		
+		String result_dimension = "";//string to store result
+		
+		result_dimension += convert(percentage[0], "EI");
+		result_dimension += convert(percentage[1], "SN");
+		result_dimension += convert(percentage[2], "TF");
+		result_dimension += convert(percentage[3], "JP");		
+	
+		return result_dimension;
+	}
+	
+	//method to convert from percentage to category
+	public static String convert(int percentage, String s){
+		String result = "";
+		if(percentage > 50){
+			result = s.substring(1,2);
+		}
+		else if(percentage < 50){
+			result = s.substring(0,1);
+		}
+		else{
+			result = "X";
+		}
+		return result;
+	}
+	/*
+	//method to count people in each dimension by categories like gender, major, color, etc.
+	public static int[] countByDimension(File resultFile, String s){
+		Scanner typeResult = new Scanner(resultFile);
+		int counter = 0;
+		int[] amountByDimension = new int[DIMENSION * 2];
+		while(typeResult.hasNextLine(){
+			String line = typeResult.nextLine();
+			
+		}		
+	}
+	*/
 
 }
