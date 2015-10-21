@@ -22,7 +22,9 @@ public class PersonalityAnalysis {
 		File resultFile = new File("result.txt");
 		Scanner typeResult = new Scanner(resultFile);
 		//wrap all surveyors' information
-		surveyor[] info = wrap(typeResult);
+		int counter_line = counterFileLines(typeResult);
+		typeResult = new Scanner(resultFile);
+		surveyor[] info = wrap(typeResult,counter_line);
 		
 		//calculate statistics of survey result by groups
 		PrintStream output = new PrintStream(new File("statistics.txt")); //output file
@@ -58,15 +60,18 @@ public class PersonalityAnalysis {
 		String major;
 		String section;
 	}
-	
-	//method to wrap all information into surveyor class
-	public static surveyor[] wrap(Scanner typeResult){
+	//,ethod to count all lines in file
+	public static int counterFileLines(Scanner typeResult){
 		//count the surveyors
 		int counter_line = 0;
 		while(typeResult.hasNextLine()){
 			String temp = typeResult.nextLine();
 			counter_line ++;			
-		}		
+		}
+		return counter_line;
+	}
+	//method to wrap all information into surveyor class
+	public static surveyor[] wrap(Scanner typeResult, int counter_line){
 		//array for all info (as surveyor class)
 		surveyor[] info = new surveyor[counter_line];
 		for(int i = 0; i < counter_line; i++){
@@ -83,6 +88,7 @@ public class PersonalityAnalysis {
 		
 		return info;
 	}
+	
 	//method to count all female/male surveyors and calculate percentages
 	public static int[] countByGender(int[] typeDistribution){
 		float[] percentage = new float[DIMENSION * 2];
