@@ -10,9 +10,6 @@ import java.io.*;
 import java.util.*;
 
 public class PersonalityAnalysis {
-	public static final int WIDTH = 1000;
-	public static final int HEIGHT = 500;
-	
 	public static final int DIMENSION = 4; //dimension of test
 	public static final int SURVEYS = 70;//survey questions
 	
@@ -24,30 +21,119 @@ public class PersonalityAnalysis {
 		//group people by gender, (intended) major, color, favorite activity, section
 		File resultFile = new File("result.txt");
 		Scanner typeResult = new Scanner(resultFile);
-		while(typeResult.hasNextLine()){
-			
-		}
-		
-		//draw plots
-		//draw the panel----or just output to file
-		DrawingPanel panel = new DrawingPanel(WIDTH, HEIGHT);
-		panel.setBackground(Color.GRAY);
-		Graphics g = panel.getGraphics();
-		//draw histograms by gender
-		
-		//draw histograms by sections
-		
+		//wrap all surveyors' information
+		surveyor[] info = wrap(typeResult);
 		
 		//calculate statistics of survey result by groups
+		PrintStream output = new PrintStream(new File("statistics.txt")); //output file
+		output.println("Welcome to Personality Survey Statistics Report of CSE 143X-2015AU");
+		output.println();
+
+		//type distribution vs. gender
+		int[] typeDistribution_F = countType(info, "F");
+		int[] percent_F = countByGender(typeDistribution_F);
+		
+		int[] typeDistribution_M = countType(info, "M");
+		int[] percent_M = countByGender(typeDistribution_M);
+		//output to file
+		output_gender(output, percent_F, percent_M);
+		
 		//most favorite color by CSE 143X
-		//most favorite activities by CSE 143X 
-		//most (intended) majors
-		//output analysis result to file		
+		
+		//output to file
+		output.println("**********************************************************");
+		output.println("Favorite Color of CSE 143X-2015AU");
+		output.println("**********************************************************");
+				
 	}
 	
 	//nested class for information of one surveyor
 	public static class surveyor{
+		String EI;
+		String SN;
+		String TF;
+		String JP;
+		String gender;
+		String color;
+		String major;
+		String section;
+	}
+	
+	//method to wrap all information into surveyor class
+	public static surveyor[] wrap(Scanner typeResult){
+		//count the surveyors
+		int counter_line = 0;
+		while(typeResult.hasNextLine()){
+			String temp = typeResult.nextLine();
+			counter_line ++;			
+		}		
+		//array for all info (as surveyor class)
+		surveyor[] info = new surveyor[counter_line];
+		for(int i = 0; i < counter_line; i++){
+			String line = typeResult.nextLine();
+			info[i].EI = line.substring(0,1);
+			info[i].SN = line.substring(1,2);
+			info[i].TF = line.substring(2,3);
+			info[i].JP = line.substring(3,4);
+			info[i].gender = line.substring(4, 5);
+			info[i].color = line.substring(5,6);
+			info[i].major = line.substring(6,7);
+			info[i].section = line.substring(7,9);				
+		}
 		
+		return info;
+	}
+	//method to count all female/male surveyors and calculate percentages
+	public static int[] countByGender(int[] typeDistribution){
+		float[] percentage = new float[DIMENSION * 2];
+		int[] percent = new int[DIMENSION*2];
+		//count all female surveyors and calculate percentages
+		int sum = 0;
+		for(int i = 0; i < DIMENSION*2; i++){
+			sum += typeDistribution[i];
+		}
+		for(int i = 0; i < DIMENSION*2; i++){
+			percentage[i] = (float)typeDistribution[i]/sum;
+			percent[i] = (int) Math.round(percentage[i] * 100);
+		}
+		
+		return percent;
+	}
+	//method to count type distribution by gender
+	public static int[] countType(surveyor[] info, String s){
+		//type distribution Vs. gender
+		int[] type = new int[DIMENSION * 2];
+		for(int i = 0; i < info.length; i++){
+			if(info[i].gender == s){
+				if(info[i].EI == "E"){
+					type[0] ++;
+				}
+				else{
+					type[1] ++;
+				}
+				
+				if(info[i].SN == "S"){
+					type[2] ++;
+				}
+				else{
+					type[3] ++;
+				}
+				
+				if(info[i].TF == "T"){
+					type[4] ++;
+				}
+				else{
+					type[5] ++;
+				}
+				if(info[i].JP == "J"){
+					type[6] ++;
+				}
+				else{
+					type[7] ++;
+				}
+			}
+		}
+		return type;
 	}
 	
 	//method to generate result file
@@ -155,17 +241,32 @@ public class PersonalityAnalysis {
 		}
 		return result;
 	}
-	/*
-	//method to count people in each dimension by categories like gender, major, color, etc.
-	public static int[] countByDimension(File resultFile, String s){
-		Scanner typeResult = new Scanner(resultFile);
-		int counter = 0;
-		int[] amountByDimension = new int[DIMENSION * 2];
-		while(typeResult.hasNextLine(){
-			String line = typeResult.nextLine();
-			
-		}		
+	//method to output to file
+	//type distribution by gender
+	public static void output_gender(PrintStream output, int[] percent_F, int[] percent_M){
+		output.println("**********************************************************");
+		output.println("Personality Type Distribution By Gender");
+		output.println("**********************************************************");
+		output.println("For female: ");
+		output.println("Extrovert: " + percent_F[0] + "%");
+		output.println("Introvert: " + percent_F[1] + "%");
+		output.println("Sensing: " + percent_F[2] + "%");
+		output.println("iNtuition: " + percent_F[3] + "%");
+		output.println("Thinking: " + percent_F[4] + "%");
+		output.println("Feeling: " + percent_F[5] + "%");
+		output.println("Judging: " + percent_F[6] + "%");
+		output.println("Perceiving: " + percent_F[7] + "%");
+		output.println();
+		output.println("For male: ");
+		output.println("Extrovert: " + percent_M[0] + "%");
+		output.println("Introvert: " + percent_M[1] + "%");
+		output.println("Sensing: " + percent_M[2] + "%");
+		output.println("iNtuition: " + percent_M[3] + "%");
+		output.println("Thinking: " + percent_M[4] + "%");
+		output.println("Feeling: " + percent_M[5] + "%");
+		output.println("Judging: " + percent_M[6] + "%");
+		output.println("Perceiving: " + percent_M[7] + "%");
+		
 	}
-	*/
 
 }
