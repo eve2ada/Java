@@ -1,5 +1,5 @@
 //Yi He
-//10/20/2015
+//10/22/2015
 //CSE 143X
 //TA:Rasika Bhalerao
 //HW #4
@@ -18,12 +18,8 @@ public class PersonalityAnalysis {
 		generateResult();
 			
 		//survey result analysis
-		//group people by gender, (intended) major, color, favorite activity, section
 		File resultFile = new File("result.txt");
 		Scanner typeResult = new Scanner(resultFile);
-		
-		int counter_line = counterFileLines(typeResult);
-//		surveyor[] info = wrap(typeResult,counter_line);
 		
 		//calculate statistics of survey result by groups
 		PrintStream output = new PrintStream(new File("statistics.txt")); //output file
@@ -53,15 +49,6 @@ public class PersonalityAnalysis {
 		output.println("Male: " + counter_M + ", count for " + (100-percentage_F) + "%");				
 	}
 	
-	//nested class for information of one surveyor
-	/*
-	public static class surveyor{
-		char EI;
-		char SN;
-		char TF;
-		char JP;
-	}
-	*/
 	//,ethod to count all lines in file
 	public static int counterFileLines(Scanner typeResult){
 		//count the surveyors
@@ -72,29 +59,6 @@ public class PersonalityAnalysis {
 		}
 		return counter_line;
 	}
-	/*
-	//method to wrap all information into surveyor class
-	public static surveyor[] countDemo(Scanner typeResult, int counter_line){
-		//array for all info (as surveyor class)
-		String[] info = new String[counter_line];
-		for(int i = 0; i < counter_line; i++){
-			String line = typeResult.nextLine();
-//			System.out.println(line);
-			info[i] = line.charAt(0);
-			System.out.println(info[i]);
-			info[i].SN = line.charAt(1);
-			info[i].TF = line.charAt(3);
-			info[i].JP = line.charAt(4);
-			info[i].gender = line.substring(4, 5);
-			info[i].color = line.substring(5,6);
-			info[i].major = line.substring(6,7);
-			info[i].section = line.substring(7,9);	
-		
-		}
-		System.out.println(Arrays.toString(info));
-		return info;
-	}
-	*/
 	
 	//method to count all surveyors and calculate percentages
 	public static int[] countPercent(int[] typeDistribution){
@@ -168,44 +132,6 @@ public class PersonalityAnalysis {
 		}
 		return counterGender;
 	}
-	/*
-	//method to count demographics information
-	public static String countDemo(Scanner demoResult, int comma){
-		String result = "";
-		while(demoResult.hasNextLine()){
-			String line = demoResult.nextLine();
-			line = demoResult.nextLine(); //skip the header
-			int start = 0;
-			int stop = 0;
-			int counter_line = 0;
-			for(int i = 0; i < line.length(); i++){
-				if(line.charAt(i) == ','){
-					counter_line ++;
-				}
-				
-				if(counter_line == comma){
-					start = i + 1;
-				}
-				if(counter_line == comma + 1){
-					stop = i;
-					break;
-				}
-			}
-			if(stop - start > 2){
-				result += line.substring(start, stop);
-				result += " ";
-			}
-		}
-		return result;
-		
-	}
-	public static String favorite(String input){
-		Hashtable<String, Integer> hashtable = new Hashtable<String, Integer>();
-		for(int i = 0; i < input.length(); i++){
-			
-		}
-	}
-	*/
 	
 	//method to generate result file
 	public static void generateResult() throws FileNotFoundException{
@@ -223,10 +149,6 @@ public class PersonalityAnalysis {
 			
 			//start from person name line
 			if(counter_line%2 == 0){
-//				output.print(line + " "); //no need to keep name
-//				line = survey.nextLine();
-//				counter_line ++;
-				//count A and B by dimension
 				//Extrovert/Introvert
 				int[] counter_EI = count(line, 0);
 				//Sensing/iNtuition
