@@ -27,22 +27,20 @@ public class PersonalityAnalysis {
 		
 		//wrap all surveyors' information
 		int counter_line = counterFileLines(typeResult);
-//		typeResult = new Scanner(resultFile);
-		surveyor[] info = wrap(typeResult,counter_line);
+//		surveyor[] info = wrap(typeResult,counter_line);
 		
 		//calculate statistics of survey result by groups
 		PrintStream output = new PrintStream(new File("statistics.txt")); //output file
 		output.println("Welcome to Personality Survey Statistics Report of CSE 143X-2015AU");
 		output.println();
 
-		//type distribution vs. gender
-		int[] typeDistribution_F = countType(info, "F");
-		int[] percent_F = countByGender(typeDistribution_F);
+		//count type distribution
+		typeResult = new Scanner(resultFile);
+		int[] typeDistribution = countType(typeResult);
+		int[] percent = countPercent(typeDistribution);
 		
-		int[] typeDistribution_M = countType(info, "M");
-		int[] percent_M = countByGender(typeDistribution_M);
 		//output to file
-		output_gender(output, percent_F, percent_M);
+		output_percentage(output, percent);
 		
 		//most favorite color by CSE 143X
 		
@@ -54,16 +52,14 @@ public class PersonalityAnalysis {
 	}
 	
 	//nested class for information of one surveyor
+	/*
 	public static class surveyor{
-		String EI;
-		String SN;
-		String TF;
-		String JP;
-		String gender;
-		String color;
-		String major;
-		String section;
+		char EI;
+		char SN;
+		char TF;
+		char JP;
 	}
+	*/
 	//,ethod to count all lines in file
 	public static int counterFileLines(Scanner typeResult){
 		//count the surveyors
@@ -74,32 +70,35 @@ public class PersonalityAnalysis {
 		}
 		return counter_line;
 	}
+	/*
 	//method to wrap all information into surveyor class
-	public static surveyor[] wrap(Scanner typeResult, Scanner demoResult, int counter_line){
+	public static surveyor[] countDemo(Scanner typeResult, int counter_line){
 		//array for all info (as surveyor class)
-		surveyor[] info = new surveyor[counter_line];
+		String[] info = new String[counter_line];
 		for(int i = 0; i < counter_line; i++){
 			String line = typeResult.nextLine();
-			String line2 = demoResult.nextLine();
-			
-			info[i].EI = line.substring(0,1);
-			info[i].SN = line.substring(1,2);
-			info[i].TF = line.substring(2,3);
-			info[i].JP = line.substring(3,4);
+//			System.out.println(line);
+			info[i] = line.charAt(0);
+			System.out.println(info[i]);
+			info[i].SN = line.charAt(1);
+			info[i].TF = line.charAt(3);
+			info[i].JP = line.charAt(4);
 			info[i].gender = line.substring(4, 5);
 			info[i].color = line.substring(5,6);
 			info[i].major = line.substring(6,7);
-			info[i].section = line.substring(7,9);				
-		}
+			info[i].section = line.substring(7,9);	
 		
+		}
+		System.out.println(Arrays.toString(info));
 		return info;
 	}
+	*/
 	
 	//method to count all female/male surveyors and calculate percentages
-	public static int[] countByGender(int[] typeDistribution){
+	public static int[] countPercent(int[] typeDistribution){
 		float[] percentage = new float[DIMENSION * 2];
 		int[] percent = new int[DIMENSION*2];
-		//count all female surveyors and calculate percentages
+		//count all  surveyors and calculate percentages
 		int sum = 0;
 		for(int i = 0; i < DIMENSION*2; i++){
 			sum += typeDistribution[i];
@@ -111,38 +110,37 @@ public class PersonalityAnalysis {
 		
 		return percent;
 	}
-	//method to count type distribution by gender
-	public static int[] countType(surveyor[] info, String s){
-		//type distribution Vs. gender
+	//method to count type distribution
+	public static int[] countType(Scanner typeResult){
+		//type distribution
 		int[] type = new int[DIMENSION * 2];
-		for(int i = 0; i < info.length; i++){
-			if(info[i].gender == s){
-				if(info[i].EI == "E"){
-					type[0] ++;
-				}
-				else{
-					type[1] ++;
-				}
-				
-				if(info[i].SN == "S"){
-					type[2] ++;
-				}
-				else{
-					type[3] ++;
-				}
-				
-				if(info[i].TF == "T"){
-					type[4] ++;
-				}
-				else{
-					type[5] ++;
-				}
-				if(info[i].JP == "J"){
-					type[6] ++;
-				}
-				else{
-					type[7] ++;
-				}
+		while(typeResult.hasNextLine()){
+			String line = typeResult.nextLine();
+			if(line.charAt(0) == 'E'){
+				type[0] ++;
+			}
+			else if(line.charAt(0) == 'I'){
+				type[1] ++;
+			}
+			
+			if(line.charAt(1) == 'S'){
+				type[2] ++;
+			}
+			else if(line.charAt(1) == 'N'){
+				type[3] ++;
+			}
+			
+			if(line.charAt(2) == 'T'){
+				type[4] ++;
+			}
+			else if(line.charAt(2) == 'F'){
+				type[5] ++;
+			}
+			if(line.charAt(3) == 'J'){
+				type[6] ++;
+			}
+			else if(line.charAt(3) == 'P'){
+				type[7] ++;
 			}
 		}
 		return type;
@@ -254,31 +252,24 @@ public class PersonalityAnalysis {
 		return result;
 	}
 	//method to output to file
-	//type distribution by gender
-	public static void output_gender(PrintStream output, int[] percent_F, int[] percent_M){
+	//type distribution
+	public static void output_percentage(PrintStream output, int[] percent){
 		output.println("**********************************************************");
-		output.println("Personality Type Distribution By Gender");
+		output.println("Personality Type Distribution");
 		output.println("**********************************************************");
-		output.println("For female: ");
-		output.println("Extrovert: " + percent_F[0] + "%");
-		output.println("Introvert: " + percent_F[1] + "%");
-		output.println("Sensing: " + percent_F[2] + "%");
-		output.println("iNtuition: " + percent_F[3] + "%");
-		output.println("Thinking: " + percent_F[4] + "%");
-		output.println("Feeling: " + percent_F[5] + "%");
-		output.println("Judging: " + percent_F[6] + "%");
-		output.println("Perceiving: " + percent_F[7] + "%");
 		output.println();
-		output.println("For male: ");
-		output.println("Extrovert: " + percent_M[0] + "%");
-		output.println("Introvert: " + percent_M[1] + "%");
-		output.println("Sensing: " + percent_M[2] + "%");
-		output.println("iNtuition: " + percent_M[3] + "%");
-		output.println("Thinking: " + percent_M[4] + "%");
-		output.println("Feeling: " + percent_M[5] + "%");
-		output.println("Judging: " + percent_M[6] + "%");
-		output.println("Perceiving: " + percent_M[7] + "%");
-		
+		output.println("Extrovert: " + percent[0] + "%");
+		output.println("Introvert: " + percent[1] + "%");
+		output.println();
+		output.println("Sensing: " + percent[2] + "%");
+		output.println("iNtuition: " + percent[3] + "%");
+		output.println();
+		output.println("Thinking: " + percent[4] + "%");
+		output.println("Feeling: " + percent[5] + "%");
+		output.println();
+		output.println("Judging: " + percent[6] + "%");
+		output.println("Perceiving: " + percent[7] + "%");
+		output.println();
 	}
 
 }
