@@ -15,14 +15,14 @@ public class PersonalityAnalysis {
 	
 	public static void main(String[] args) throws FileNotFoundException{		
 		//generate result file
-		generateResult();
+		String outputFile = generateResult();
 			
-		//survey result analysis
+		//survey result analysis(temporary output)
 		File resultFile = new File("result.txt");
 		Scanner typeResult = new Scanner(resultFile);
 		
 		//calculate statistics of survey result by groups
-		PrintStream output = new PrintStream(new File("statistics.txt")); //output file
+		PrintStream output = new PrintStream(new File(outputFile)); //output file
 		output.println("Welcome to Personality Survey Statistics Report of CSE 143X-2015AU");
 		output.println();
 
@@ -49,7 +49,7 @@ public class PersonalityAnalysis {
 		output.println("Male: " + counter_M + ", count for " + (100-percentage_F) + "%");				
 	}
 	
-	//,ethod to count all lines in file
+	//method to count all lines in file
 	public static int counterFileLines(Scanner typeResult){
 		//count the surveyors
 		int counter_line = 0;
@@ -134,9 +134,16 @@ public class PersonalityAnalysis {
 	}
 	
 	//method to generate result file
-	public static void generateResult() throws FileNotFoundException{
+	public static String generateResult() throws FileNotFoundException{
+		//get input and output file name
+		Scanner console = new Scanner(System.in);
+		System.out.println("What's your input file name of personality survey (not demographics file)?");
+		String inputFile = console.next();
+		System.out.println("What's the output file name?");
+		String outputFile = console.next();
+		
 		//read and analyze data file
-		File surveyFile = new File("bigdata.txt");
+		File surveyFile = new File(inputFile);
 		Scanner survey = new Scanner(surveyFile);
 		
 		PrintStream output = new PrintStream(new File("result.txt")); //output file
@@ -166,6 +173,7 @@ public class PersonalityAnalysis {
 				output.println(line.substring(SURVEYS));
 			}
 		}
+		return outputFile;
 	}
 	
 	//method to count A and B in one dimension
@@ -198,7 +206,6 @@ public class PersonalityAnalysis {
 	public static int calPercentage(int[] counter){
 		float percentage = ((float)counter[1])/(counter[0] + counter[1]);
 		int percent = (int) Math.round(percentage * 100);
-//		System.out.println(percent);
 		return percent;
 	}
 	
