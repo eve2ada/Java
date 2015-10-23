@@ -21,9 +21,13 @@ public class PersonalityAnalysis {
 		//group people by gender, (intended) major, color, favorite activity, section
 		File resultFile = new File("result.txt");
 		Scanner typeResult = new Scanner(resultFile);
+		
+		File demoFile = new File("demographics.csv");
+		Scanner demoResult = new Scanner(demoFile);
+		
 		//wrap all surveyors' information
 		int counter_line = counterFileLines(typeResult);
-		typeResult = new Scanner(resultFile);
+//		typeResult = new Scanner(resultFile);
 		surveyor[] info = wrap(typeResult,counter_line);
 		
 		//calculate statistics of survey result by groups
@@ -71,11 +75,13 @@ public class PersonalityAnalysis {
 		return counter_line;
 	}
 	//method to wrap all information into surveyor class
-	public static surveyor[] wrap(Scanner typeResult, int counter_line){
+	public static surveyor[] wrap(Scanner typeResult, Scanner demoResult, int counter_line){
 		//array for all info (as surveyor class)
 		surveyor[] info = new surveyor[counter_line];
 		for(int i = 0; i < counter_line; i++){
 			String line = typeResult.nextLine();
+			String line2 = demoResult.nextLine();
+			
 			info[i].EI = line.substring(0,1);
 			info[i].SN = line.substring(1,2);
 			info[i].TF = line.substring(2,3);
@@ -145,7 +151,7 @@ public class PersonalityAnalysis {
 	//method to generate result file
 	public static void generateResult() throws FileNotFoundException{
 		//read and analyze data file
-		File surveyFile = new File("E:/Temp/Java/HW4/src/bigdata.txt");
+		File surveyFile = new File("bigdata.txt");
 		Scanner survey = new Scanner(surveyFile);
 		
 		PrintStream output = new PrintStream(new File("result.txt")); //output file
