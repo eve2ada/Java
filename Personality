@@ -1,5 +1,5 @@
 //Yi He
-//10/20/2015
+//10/22/2015
 //CSE 143X
 //TA:Rasika Bhalerao
 //HW #4
@@ -13,11 +13,17 @@ public class Personality {
 	public static final int SURVEYS = 70;//survey questions
 	
 	public static void main(String[] args) throws FileNotFoundException {
+		//get input and output file name
+		Scanner console = new Scanner(System.in);
+		System.out.println("What's your input file name?");
+		String inputFile = console.next();
+		System.out.println("What's the output file name?");
+		String outputFile = console.next();
 		//import and read file
-		File surveyFile = new File("E:/Temp/Java/HW4/src/bigdata.txt");
+		File surveyFile = new File(inputFile);
 		Scanner survey = new Scanner(surveyFile);
 		
-		PrintStream output = new PrintStream(new File("result.txt")); //output file
+		PrintStream output = new PrintStream(new File(outputFile)); //output file
 		int counter_line = 0; // a counter to record current line number
 		
 		while(survey.hasNextLine()){
