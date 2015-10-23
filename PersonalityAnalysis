@@ -5,7 +5,7 @@
 //HW #4
 //
 //This program will reveal something interesting about the class data
-import java.awt.*;
+
 import java.io.*;
 import java.util.*;
 
@@ -22,10 +22,6 @@ public class PersonalityAnalysis {
 		File resultFile = new File("result.txt");
 		Scanner typeResult = new Scanner(resultFile);
 		
-		File demoFile = new File("demographics.csv");
-		Scanner demoResult = new Scanner(demoFile);
-		
-		//wrap all surveyors' information
 		int counter_line = counterFileLines(typeResult);
 //		surveyor[] info = wrap(typeResult,counter_line);
 		
@@ -42,13 +38,19 @@ public class PersonalityAnalysis {
 		//output to file
 		output_percentage(output, percent);
 		
-		//most favorite color by CSE 143X
+		//count gender in survey
+		int counter_F = countGender('F');
+		int counter_M = countGender('M');
 		
+		double percentage_F = 100.0 * counter_F/(counter_F + counter_M);
+
 		//output to file
 		output.println("**********************************************************");
-		output.println("Favorite Color of CSE 143X-2015AU");
+		output.println("Gender Distribution of Personality Survey");
 		output.println("**********************************************************");
-				
+		output.println();
+		output.println("Female: " + counter_F + ", count for " + percentage_F + "%");
+		output.println("Male: " + counter_M + ", count for " + (100-percentage_F) + "%");				
 	}
 	
 	//nested class for information of one surveyor
@@ -94,7 +96,7 @@ public class PersonalityAnalysis {
 	}
 	*/
 	
-	//method to count all female/male surveyors and calculate percentages
+	//method to count all surveyors and calculate percentages
 	public static int[] countPercent(int[] typeDistribution){
 		float[] percentage = new float[DIMENSION * 2];
 		int[] percent = new int[DIMENSION*2];
@@ -145,6 +147,65 @@ public class PersonalityAnalysis {
 		}
 		return type;
 	}
+	
+	//method to count gender percentage
+	public static int countGender(char G) throws FileNotFoundException{
+		File demoFile = new File("demographics.csv");
+		Scanner demoResult = new Scanner(demoFile);
+		
+		int counterGender = 0;
+		while(demoResult.hasNextLine()){
+			String line = demoResult.nextLine();
+			for(int i = 0; i < line.length(); i++){
+				if(line.charAt(i) == ','){
+					char temp = line.charAt(i + 2);
+					if(temp == G){
+						counterGender ++;
+					}
+					break;
+				}
+			}
+		}
+		return counterGender;
+	}
+	/*
+	//method to count demographics information
+	public static String countDemo(Scanner demoResult, int comma){
+		String result = "";
+		while(demoResult.hasNextLine()){
+			String line = demoResult.nextLine();
+			line = demoResult.nextLine(); //skip the header
+			int start = 0;
+			int stop = 0;
+			int counter_line = 0;
+			for(int i = 0; i < line.length(); i++){
+				if(line.charAt(i) == ','){
+					counter_line ++;
+				}
+				
+				if(counter_line == comma){
+					start = i + 1;
+				}
+				if(counter_line == comma + 1){
+					stop = i;
+					break;
+				}
+			}
+			if(stop - start > 2){
+				result += line.substring(start, stop);
+				result += " ";
+			}
+		}
+		return result;
+		
+	}
+	public static String favorite(String input){
+		Hashtable<String, Integer> hashtable = new Hashtable<String, Integer>();
+		for(int i = 0; i < input.length(); i++){
+			
+		}
+	}
+	*/
 	
 	//method to generate result file
 	public static void generateResult() throws FileNotFoundException{
