@@ -1,0 +1,13 @@
+public static String[] sandwich(String bread, String[] fillings, int fillFactor){
+    String[] output = new String[2 + fillings.length * fillFactor];
+    output[0] = bread;
+    output[output.length-1] = bread;
+    int temp = 0;
+    while(temp < fillFactor){
+        for(int i = 0; i < fillings.length; i ++){
+            output[i + 1 + temp*fillings.length] = fillings[i];
+        }
+        temp ++;
+    }
+    return output;
+}
