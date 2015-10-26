@@ -1,0 +1,52 @@
+		public static void triathlon(Scanner input){
+		    String line = input.nextLine();
+		    Scanner lineWords = new Scanner(line);
+		    String s = lineWords.next();
+		    System.out.print(s + ": ");
+		    int sum = 0;
+		    for(int i = 0; i < 3; i++){
+		        sum += lineWords.nextInt();
+		    }
+		    System.out.print(sum + " min");
+		    System.out.println();
+		    
+		    int sum_temp = 0;
+		    int count_temp = 0;
+		    if(lineWords.hasNext()){
+	            s = lineWords.next();
+	            System.out.print(s + ": ");
+		    }
+		    while(lineWords.hasNextInt()){
+		    	sum_temp += lineWords.nextInt();
+		    	count_temp ++;
+		    }
+		    if(count_temp == 3){
+		    	System.out.print(sum_temp + " min (+" + (sum_temp - sum) + " min)");
+		    	sum_temp = 0;
+		    	count_temp = 0;
+		    	System.out.println();
+		    }
+		    
+		    while(input.hasNextLine()){
+		    	line = input.nextLine();
+		    	lineWords = new Scanner(line);
+		    	while(lineWords.hasNext()){
+			    	while(lineWords.hasNextInt()){
+			    		sum_temp += lineWords.nextInt();
+			    		count_temp ++;
+			    	}
+				    if(count_temp == 3){
+				    	System.out.print(sum_temp + " min (+" + (sum_temp - sum) + " min)");
+				    	sum_temp = 0;
+				    	count_temp = 0;
+				    	System.out.println();
+				    }
+			    	
+				    if(lineWords.hasNext()){
+			    		s = lineWords.next();
+			    		System.out.print(s + ": ");
+			    	}
+		    	}
+		    	
+		    }
+		}
