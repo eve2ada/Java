@@ -1,31 +1,17 @@
-		public static void evenOdd(int[] input){
-		    int ix_e = -1;
-		    int ix_o = -1;
-		    int temp = 0;
-		    for(int i = 0; i < input.length; i ++){
-		        if(i%2 != input[i]%2){
-		            if(i%2 == 0){
-		                if(ix_o != -1){
-		                    temp = input[i];
-		                    input[i] = input[ix_o];
-		                    input[ix_o] = temp;
-		                    ix_o = -1;
-		                }
-		                else{
-		                    ix_e = i;
-		                }
-		            }
-		            else{
-		                if(ix_e != -1){
-		                    temp = input[i];
-		                    input[i] = input[ix_e];
-		                    input[ix_e] = temp;
-		                    ix_e = -1;
-		                }
-		                else{
-		                    ix_o = i;
-		                }
-		            }
-		        }
-		    }
-		}
+public static void evenOdd(int[] input){
+	int temp = 0;
+	for(int i = 0; i < input.length; i ++){
+	        if(i%2 != input[i]%2){
+	            for(int j = i + 1; j < input.length; j ++){
+	                if(j%2 != input[j]%2){
+	                    if(i%2 != j%2){
+	                       temp = input[i];
+	                       input[i] = input[j];
+	                       input[j] = temp;
+	                    }
+	                }
+	            }
+                }
+ 
+	}
+}
