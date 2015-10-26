@@ -1,0 +1,29 @@
+		public static void flip(Random r){
+		    int count = 3;
+		    String heads = "";
+		    for(int i = 0; i < 3; i++){
+		    	int temp = r.nextInt(2);
+		    	if(temp == 1){
+                    System.out.println("tails");
+		    		heads += "t";
+		    	}
+		    	else{
+                    System.out.println("heads");
+		    		heads += "h";
+		    	}
+		    }
+		    
+		    while(!(heads.substring(heads.length()-3, heads.length()).equals("hhh"))){
+		        int temp = r.nextInt(2);
+		        count ++;
+		        if(temp == 1){
+		            System.out.println("tails");
+		            heads += "t";
+		        }
+		        if(temp == 0){
+		            System.out.println("heads");
+		            heads += "h";
+		        }
+		    }
+		    System.out.println("3 heads in a row after " + count + " flips");
+		}
