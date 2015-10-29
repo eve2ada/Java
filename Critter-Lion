@@ -1,0 +1,70 @@
+//Yi He
+//10/29/2015
+//CSE 143X
+//TA:Rasika Bhalerao
+//HW #5
+//
+//This program will implement a lion
+
+import java.awt.*;
+import java.util.*;
+
+public class Lion extends Critter {
+	CritterInfo info;
+	Random r = new Random();
+	int numMoves;
+	
+	//Initializes the Lion
+	public Lion() {
+		numMoves = 0;
+	}
+	
+	//Every three moves, lions should randomly pick between red, green, and blue,
+	//use the color chosen, then pick again for the next three moves.
+	public Color getColor(){
+		if(r.nextInt(3) == 0){
+			return Color.RED;
+		}
+		if(r.nextInt(3) == 1){
+			return Color.GREEN;
+		}
+		else{
+			return Color.BLUE;
+		}
+	}
+	
+	//Lions should always be “L”
+	public String toString(){
+		return "L";
+	}
+	
+	//Always infect if an enemy is in front. Otherwise, if a wall is in front or to the
+	//right, then turn left. Otherwise, if a fellow Lion is in front, then turn left.
+	//Otherwise, hop.
+	public Action getMove(){
+		if(info.getFront() == Neighbor.OTHER){
+			return Action.INFECT;
+		}
+		else if(info.getFront() == Neighbor.WALL || info.getRight() == Neighbor.WALL){
+			numMoves ++;
+			if(numMoves == 3){
+				this.getColor();
+			}
+			return Action.LEFT;
+		}
+		else if(info.getFront() == Neighbor.SAME){
+			numMoves ++;
+			if(numMoves == 3){
+				this.getColor();
+			}
+			return Action.LEFT;
+		}
+		else{
+			numMoves ++;
+			if(numMoves == 3){
+				this.getColor();
+			}
+			return Action.HOP;
+		}
+	}
+}
