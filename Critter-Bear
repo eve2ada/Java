@@ -1,0 +1,66 @@
+//Yi He
+//10/28/2015
+//CSE 143X
+//TA:Rasika Bhalerao
+//HW #5
+//
+//This program will implement a bear(might be black bear or polar bear)
+
+import java.awt.*;
+
+public class Bear extends Critter{
+	private boolean polar;
+	private String slash;
+//	private Action move;
+	private CritterInfo info;
+	
+	//polar determines if this Bear is a polar bear or a black bear
+	public Bear(boolean polar) {
+		this.polar = true;
+		this.slash = "/";
+//		this.move = Action.HOP;
+	}
+	
+	//Color.WHITE for a polar bear, Color.BLACK otherwise
+	public Color getColor(){
+		if(this.polar){
+			return Color.WHITE;
+		}
+		else{
+			return Color.BLACK;
+		}
+		
+	}
+	
+	//alternate on each different move between a slash character (/) and a
+	//backslash character (\). The first character should be a slash.
+	public String toString(){
+		return slash;
+	}
+	
+	//Always infect if an enemy is in front. Otherwise, hop if possible. Otherwise,
+	//turn left.
+	public Action getMove(){
+        if (info.getFront() == Neighbor.OTHER) {
+            return Action.INFECT;
+        } 
+        else if(info.getFront() == Neighbor.EMPTY){
+    		if(slash.equals("/")){
+    			slash = "\\"; 
+    		}
+    		else{
+    			slash = "/";
+    		}
+        	return Action.HOP;
+        }
+        else{
+    		if(slash.equals("/")){
+    			slash = "\\"; 
+    		}
+    		else{
+    			slash = "/";
+    		}
+            return Action.LEFT;
+        }
+	}
+}
