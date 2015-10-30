@@ -1,0 +1,42 @@
+import java.awt.Color;
+import java.util.Random;
+
+public class Husky extends Critter {
+		Color UWPurple = new Color(51, 0, 111);
+		
+		//Husky should always be Purple 
+		public Color getColor(){
+			return UWPurple;
+		}
+		
+		//Husky should always be “L”
+		public String toString(){
+			return "H";
+		}
+		
+		//Avoid to infect others, always turn LEFT or turn RIGHT if an enemy is in front if possible
+		public Action getMove(CritterInfo info){
+			if(info.getFront() != Neighbor.EMPTY){
+				if(info.getLeft() == Neighbor.EMPTY){
+					return Action.HOP;
+				}
+				else if(info.getRight() == Neighbor.EMPTY){
+					return Action.HOP;
+				}
+				else{
+					
+				}
+			}
+			else if(info.getFront() == Neighbor.WALL || info.getRight() == Neighbor.WALL){
+				return Action.LEFT;
+			}
+			else if(info.getFront() == Neighbor.SAME){
+				return Action.LEFT;
+			}
+			else{
+				return Action.HOP;
+			}
+		}
+	}
+
+}
