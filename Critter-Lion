@@ -10,27 +10,32 @@ import java.awt.*;
 import java.util.*;
 
 public class Lion extends Critter {
-	CritterInfo info;
-	Random r = new Random();
-	int numMoves;
+	private Random r = new Random();
+	private int numMoves; // store times of moves
+	private Color currentColor;
 	
 	//Initializes the Lion
 	public Lion() {
 		numMoves = 0;
+		currentColor = getColor();
 	}
 	
 	//Every three moves, lions should randomly pick between red, green, and blue,
 	//use the color chosen, then pick again for the next three moves.
 	public Color getColor(){
-		if(r.nextInt(3) == 0){
-			return Color.RED;
+		if(numMoves%3 == 0){
+			int randomColor = r.nextInt(3);
+			if(randomColor == 0){
+				currentColor = Color.RED;
+			}
+			else if(randomColor == 1){
+				currentColor = Color.GREEN;
+			}
+			else{
+				currentColor = Color.BLUE;
+			}
 		}
-		if(r.nextInt(3) == 1){
-			return Color.GREEN;
-		}
-		else{
-			return Color.BLUE;
-		}
+		return currentColor;
 	}
 	
 	//Lions should always be “L”
@@ -41,29 +46,20 @@ public class Lion extends Critter {
 	//Always infect if an enemy is in front. Otherwise, if a wall is in front or to the
 	//right, then turn left. Otherwise, if a fellow Lion is in front, then turn left.
 	//Otherwise, hop.
-	public Action getMove(){
+	public Action getMove(CritterInfo info){
 		if(info.getFront() == Neighbor.OTHER){
 			return Action.INFECT;
 		}
 		else if(info.getFront() == Neighbor.WALL || info.getRight() == Neighbor.WALL){
 			numMoves ++;
-			if(numMoves == 3){
-				this.getColor();
-			}
 			return Action.LEFT;
 		}
 		else if(info.getFront() == Neighbor.SAME){
 			numMoves ++;
-			if(numMoves == 3){
-				this.getColor();
-			}
 			return Action.LEFT;
 		}
 		else{
 			numMoves ++;
-			if(numMoves == 3){
-				this.getColor();
-			}
 			return Action.HOP;
 		}
 	}
