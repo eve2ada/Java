@@ -1,0 +1,58 @@
+import java.awt.*;
+
+public class Giant extends Critter {
+	private int numMoves;// store times of moves
+	private String display; //store displayed strings
+	
+	public Giant() {
+		numMoves = 0;
+		display = "fee";
+	}
+	
+	//Giants should always be gray
+	public Color getColor(){
+		return Color.GRAY;
+	}
+	
+	//“fee” for 6 moves, then “fee”, for 6 moves, then “foe” for 6 moves, then “fum" for
+	//6 moves. Then, repeat.
+	public String toString(){
+		if(numMoves%24 < 6){
+			display = "fee";
+		}
+		if(numMoves%24 >= 6 && numMoves%24 < 12 ){
+			display = "fie";
+		}
+		if(numMoves%24 >= 12 && numMoves%24 < 18){
+			display = "foe";
+		}
+		if(numMoves%24 >= 18 && numMoves%24 < 24){
+			display = "fum";
+		}
+		
+		return display;
+	}
+	
+	//Always infect if an enemy is in front. Otherwise, hop if possible. Otherwise,
+	//turn right.
+	public Action getMove(CritterInfo info){
+		if(info.getFront() == Neighbor.OTHER){
+			return Action.INFECT;
+		}
+		if(info.getFront() == Neighbor.EMPTY){
+			numMoves ++;
+			if(numMoves%24 == 24){
+				numMoves = 0;
+			}
+			return Action.HOP;
+		}
+		else{
+			numMoves++;
+			if(numMoves%24 == 24){
+				numMoves = 0;
+			}
+			return Action.RIGHT;
+		}
+		
+	}
+}
