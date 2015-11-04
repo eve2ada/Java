@@ -1,0 +1,106 @@
+//Yi He
+//11/03/2015
+//CSE 143X
+//TA:Rasika Bhalerao
+//HW #6
+//
+//This program will implement a linked list to manage Assassin game
+import java.util.*;
+
+public class AssassinManager {
+	//define a reference to front node of kill ring
+	public AssassinNode headK;
+	//define a reference to front node of graveyard (null if empty)
+	public AssassinNode headG;
+	
+	//constructor of AssassinManager
+	public AssassinManager(List<String> names){
+		//initialize king ring
+		int namesSize = names.size();//store amount of names
+		//king ring begins from the tail
+		this.headK = new AssassinNode(names.get(0));
+		AssassinNode temp = this.headK;//temporarily store current node
+		for(int i = 1; i < namesSize; i++){
+			temp.next = new AssassinNode(names.get(i));
+			temp.next.killer = temp.name;	
+			temp = temp.next;			
+		}
+		
+		//initialize graveyard
+		this.headG = null;
+	}
+	
+	//method to print names of people in the kill ring
+	public void printKillRing(){
+		//temporary variable to store current node to be printed
+		AssassinNode temp = this.headK;
+		while(temp.next != null){
+			System.out.println("    " + temp.name + " is stalking " 
+					+ temp.next.name);
+			temp = temp.next;
+		}
+	}
+	
+	//method to print the names of the people in the graveyard
+	public void printGraveyard(){
+		if(this.headG != null){
+			//temporary variable to store current node to be printed
+			AssassinNode temp = this.headG;
+			while(temp.next != null){
+				System.out.println("    " + temp.name + " was killed by " 
+						+ temp.killer);
+				temp = temp.next;
+			}
+		}
+	}
+	
+	//method to return true if given name is in current kill ring
+	//and false otherwise
+	public boolean killRingContains(String name){
+		return this.contains(this.headK, name);
+	}
+	
+	//method to return true if the given name is in the current graveyard
+	//and false otherwise
+	public boolean graveyardContains(String name){
+		return this.contains(this.headG, name);	
+	}
+	
+	//method to return true if given name is in the current linked list with
+	//head as the front node
+	private boolean contains(AssassinNode head, String name){
+		//temporary variable to store current node to be checked
+		AssassinNode temp = head;
+		while(temp != null){
+			if(temp.name.equals(name.toLowerCase())){
+				return true;
+			}
+			temp = temp.next;
+		}
+		return true;		
+	}
+	
+	//method should return true if the game is over (the kill ring has 
+	//just one person) and false otherwise
+	public boolean isGameOver(){
+		if(this.headK.next == null){
+			return true;
+		}
+		return false;
+	}
+	
+	//method to return the name of the winner of the game
+	//or null if the game is not over
+	public String winner(){
+		if(!this.isGameOver()){
+			return this.headK.name;
+		}
+		return null;
+	}
+	
+	//method to record the assassination of the person with the given name, 
+	//transferring person from the kill ring to the front of the graveyard
+	public void kill(String name){
+		
+	}
+}
