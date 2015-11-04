@@ -25,6 +25,7 @@ public class AssassinManager {
 			temp.next.killer = temp.name;	
 			temp = temp.next;			
 		}
+		this.headK.killer = temp.name;
 		
 		//initialize graveyard
 		this.headG = null;
@@ -113,24 +114,39 @@ public class AssassinManager {
 		else{
 			//define temporary variable to store information of head
 			AssassinNode tempK = this.headK;
-//			AssassinNode tempG = this.headG;
-			String killedName;//store killed name temporarily
-			String killerName;//store killer name temporarily
+			String killedName = this.headK.name;;//store killed name temporarily
+			String killerName = this.headK.killer;//store killer name temporarily
+			boolean done = false; //indicate if while loop is done
 			//check each node in king ring
 			//if name found in one king ring node, then remove it from king ring
-			while(tempK.next != null){
-				if(tempK.next.name.toLowerCase().equals(name.toLowerCase())){
-					killedName = tempK.next.name;
-					killerName = tempK.name;
-					tempK.next = tempK.next.next;
-
-				//and insert a node in front of graveyard	
-					this.headG = new AssassinNode(killedName, headG);
-					this.headG.killer = killerName;
-					System.out.println("this is a graveyard " + this.headG.name);
-					break;
+			while(!done){
+				tempK = this.headK;
+				//in case the head is the victim
+				if(this.headK.name.toLowerCase().equals(name.toLowerCase())){
+					this.headK = this.headK.next;
+					//to obtain the last name in king ring to set in head's killer
+					tempK = headK;
+					while(tempK.next != null){
+						tempK = tempK.next;
+					}
+					this.headK.killer = tempK.name;
+					done = true;
 				}
-				tempK = tempK.next;
+				//in case the victim is not the head	
+				else{
+					while(tempK.next != null){
+						if(tempK.next.name.toLowerCase().equals(name.toLowerCase())){
+							killedName = tempK.next.name;
+							killerName = tempK.name;
+							tempK.next = tempK.next.next;	
+							done = true;
+						}
+						tempK = tempK.next;
+					}
+				}
+				//and insert a node in front of graveyard	
+				this.headG = new AssassinNode(killedName, headG);
+				this.headG.killer = killerName;
 			}
 		}
 	}
