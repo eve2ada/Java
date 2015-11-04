@@ -46,7 +46,7 @@ public class AssassinManager {
 		if(this.headG != null){
 			//temporary variable to store current node to be printed
 			AssassinNode temp = this.headG;
-			while(temp.next != null){
+			while(temp != null){
 				System.out.println("    " + temp.name + " was killed by " 
 						+ temp.killer);
 				temp = temp.next;
@@ -72,12 +72,12 @@ public class AssassinManager {
 		//temporary variable to store current node to be checked
 		AssassinNode temp = head;
 		while(temp != null){
-			if(temp.name.equals(name.toLowerCase())){
+			if(temp.name.toLowerCase().equals(name.toLowerCase())){
 				return true;
 			}
 			temp = temp.next;
 		}
-		return true;		
+		return false;		
 	}
 	
 	//method should return true if the game is over (the kill ring has 
@@ -101,31 +101,36 @@ public class AssassinManager {
 	//method to record the assassination of the person with the given name, 
 	//transferring person from the kill ring to the front of the graveyard
 	public void kill(String name){
+		//first check if game is over
 		if(this.isGameOver()){
 			throw new IllegalStateException("Game is over now.");
 		}
+		//then check if the name is in current king ring
 		else if(!this.killRingContains(name)){
-			throw new IllegalArgumentException("name is not in current kill ring.");
+			throw new IllegalArgumentException("name not in current kill ring");
 		}
+		//at last to deal with it
 		else{
+			//define temporary variable to store information of head
 			AssassinNode tempK = this.headK;
-			AssassinNode tempG = this.headG;
-			String killedName;
-			String killerName;
-			if(tempK.name.toLowerCase().equals(name.toLowerCase())){
-				killedName = this.headK.name;
-				killerName = this.headK.killer;
-				this.headK = tempK.next;
-				
-				this.headG = new AssassinNode(killedName, tempG);
-				this.headG.killer = killerName;
-			}
-			else{
-				while(tempK.next != null){
-					if(tempK.name.toLowerCase().equals(name.toLowerCase())){
-						
-					}
+//			AssassinNode tempG = this.headG;
+			String killedName;//store killed name temporarily
+			String killerName;//store killer name temporarily
+			//check each node in king ring
+			//if name found in one king ring node, then remove it from king ring
+			while(tempK.next != null){
+				if(tempK.next.name.toLowerCase().equals(name.toLowerCase())){
+					killedName = tempK.next.name;
+					killerName = tempK.name;
+					tempK.next = tempK.next.next;
+
+				//and insert a node in front of graveyard	
+					this.headG = new AssassinNode(killedName, headG);
+					this.headG.killer = killerName;
+					System.out.println("this is a graveyard " + this.headG.name);
+					break;
 				}
+				tempK = tempK.next;
 			}
 		}
 	}
