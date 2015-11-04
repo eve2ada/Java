@@ -101,6 +101,32 @@ public class AssassinManager {
 	//method to record the assassination of the person with the given name, 
 	//transferring person from the kill ring to the front of the graveyard
 	public void kill(String name){
-		
+		if(this.isGameOver()){
+			throw new IllegalStateException("Game is over now.");
+		}
+		else if(!this.killRingContains(name)){
+			throw new IllegalArgumentException("name is not in current kill ring.");
+		}
+		else{
+			AssassinNode tempK = this.headK;
+			AssassinNode tempG = this.headG;
+			String killedName;
+			String killerName;
+			if(tempK.name.toLowerCase().equals(name.toLowerCase())){
+				killedName = this.headK.name;
+				killerName = this.headK.killer;
+				this.headK = tempK.next;
+				
+				this.headG = new AssassinNode(killedName, tempG);
+				this.headG.killer = killerName;
+			}
+			else{
+				while(tempK.next != null){
+					if(tempK.name.toLowerCase().equals(name.toLowerCase())){
+						
+					}
+				}
+			}
+		}
 	}
 }
