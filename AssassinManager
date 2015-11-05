@@ -95,7 +95,7 @@ public class AssassinManager {
 	//method to return the name of the winner of the game
 	//or null if the game is not over
 	public String winner(){
-		if(!this.isGameOver()){
+		if(this.isGameOver()){
 			return this.headK.name;
 		}
 		return null;
@@ -129,7 +129,6 @@ public class AssassinManager {
 				while(tempK.next != null){
 					tempK = tempK.next;
 				}
-//				System.out.println("I am tempK.name " + tempK.name);
 				this.headK.killer = tempK.name;
 				killerName = tempK.name;
 				
@@ -147,10 +146,6 @@ public class AssassinManager {
 				}
 				//in case the victim is the last node
 				if(tempK.next.name.toLowerCase().equals(name.toLowerCase())){
-					//in case there is only two nodes left
-//					if(tempK.name == this.headK.name){
-//						this.headK.next = null;
-//					}
 					killedName = tempK.next.name;
 					killerName = tempK.name;
 					tempK.next = null;
