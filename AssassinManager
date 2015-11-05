@@ -40,6 +40,8 @@ public class AssassinManager {
 					+ temp.next.name);
 			temp = temp.next;
 		}
+		System.out.println("    " + temp.name + " is stalking " 
+				+ this.headK.name);
 	}
 	
 	//method to print the names of the people in the graveyard
@@ -121,12 +123,16 @@ public class AssassinManager {
 			//if name found in one king ring node, then remove it from king ring
 			//in case the head is the victim
 			if(this.headK.name.toLowerCase().equals(name.toLowerCase())){
+				killedName = this.headK.name;
 				this.headK = this.headK.next;
 				//obtain the last name in king ring to set in head's killer
 				while(tempK.next != null){
 					tempK = tempK.next;
 				}
+//				System.out.println("I am tempK.name " + tempK.name);
 				this.headK.killer = tempK.name;
+				killerName = tempK.name;
+				
 			}
 			//in case the victim is not the head	
 			else{
@@ -141,9 +147,13 @@ public class AssassinManager {
 				}
 				//in case the victim is the last node
 				if(tempK.next.name.toLowerCase().equals(name.toLowerCase())){
+					//in case there is only two nodes left
+//					if(tempK.name == this.headK.name){
+//						this.headK.next = null;
+//					}
 					killedName = tempK.next.name;
 					killerName = tempK.name;
-					tempK.next = null;	
+					tempK.next = null;
 				}
 			}
 			//and insert a node in front of graveyard	
