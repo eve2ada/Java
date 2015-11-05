@@ -119,35 +119,34 @@ public class AssassinManager {
 			boolean done = false; //indicate if while loop is done
 			//check each node in king ring
 			//if name found in one king ring node, then remove it from king ring
-			while(!done){
-				tempK = this.headK;
+//			while(!done){
+//				tempK = this.headK;
 				//in case the head is the victim
-				if(this.headK.name.toLowerCase().equals(name.toLowerCase())){
-					this.headK = this.headK.next;
-					//to obtain the last name in king ring to set in head's killer
-					tempK = headK;
-					while(tempK.next != null){
-						tempK = tempK.next;
-					}
-					this.headK.killer = tempK.name;
-					done = true;
+			if(this.headK.name.toLowerCase().equals(name.toLowerCase())){
+				this.headK = this.headK.next;
+				//obtain the last name in king ring to set in head's killer
+//				tempK = headK;
+				while(tempK.next != null){
+					tempK = tempK.next;
 				}
-				//in case the victim is not the head	
-				else{
-					while(tempK.next != null){
-						if(tempK.next.name.toLowerCase().equals(name.toLowerCase())){
-							killedName = tempK.next.name;
-							killerName = tempK.name;
-							tempK.next = tempK.next.next;	
-							done = true;
-						}
-						tempK = tempK.next;
+				this.headK.killer = tempK.name;
+//				done = true;
+			}
+			//in case the victim is not the head	
+			else{
+				while(tempK.next != null){
+					if(tempK.next.name.toLowerCase().equals(name.toLowerCase())){
+						killedName = tempK.next.name;
+						killerName = tempK.name;
+						tempK.next = tempK.next.next;	
+//						done = true;
 					}
+					tempK = tempK.next;
 				}
+			}
 				//and insert a node in front of graveyard	
 				this.headG = new AssassinNode(killedName, headG);
 				this.headG.killer = killerName;
 			}
 		}
-	}
 }
