@@ -25,7 +25,7 @@ public class AssassinManager {
 			temp.next.killer = temp.name;	
 			temp = temp.next;			
 		}
-		this.headK.killer = temp.name;
+		this.headK.killer = names.get(namesSize - 1);
 		
 		//initialize graveyard
 		this.headG = null;
@@ -104,56 +104,58 @@ public class AssassinManager {
 	//method to record the assassination of the person with the given name, 
 	//transferring person from the kill ring to the front of the graveyard
 	public void kill(String name){
-		//first check if game is over
+		//first check if game is over, throw an IllegalStateException if yes
 		if(this.isGameOver()){
 			throw new IllegalStateException("Game is over now.");
 		}
 		//then check if the name is in current king ring
+		//throw an IllegalArgumentException if no
 		else if(!this.killRingContains(name)){
-			throw new IllegalArgumentException("name not in current kill ring");
+			throw new IllegalArgumentException("name not in current killring");
 		}
 		//at last to deal with it
 		else{
 			//define temporary variable to store information of head
 			AssassinNode tempK = this.headK;
-			String killedName = this.headK.name;;//store killed name temporarily
 			String killerName = this.headK.killer;//store killer name temporarily
 			boolean done = false; //indicate if while loop is done
 			//check each node in king ring
-			//if name found in one king ring node, then remove it from king ring
+			//if name found in one king ring node, then move it from king ring
+			//to graveyard
 			//in case the head is the victim
 			if(this.headK.name.toLowerCase().equals(name.toLowerCase())){
-				killedName = this.headK.name;
-				this.headK = this.headK.next;
-				//obtain the last name in king ring to set in head's killer
-				while(tempK.next != null){
-					tempK = tempK.next;
-				}
-				this.headK.killer = tempK.name;
-				killerName = tempK.name;
+				tempK = this.headK.next;
+				killerName = this.headK.killer;
+				//move headK to graveyard				
+				this.headK.next = this.headG;
+				this.headG = this.headK;
 				
+				this.headK = tempK;
+				this.headK.killer = killerName;				
 			}
 			//in case the victim is not the head	
 			else{
 				while(tempK.next.next != null && !done){
 					if(tempK.next.name.toLowerCase().equals(name.toLowerCase())){
-						killedName = tempK.next.name;
-						killerName = tempK.name;
-						tempK.next = tempK.next.next;	
+						AssassinNode tempK1 = tempK.next.next;//store killed node
+						//move killed node to graveyard
+						tempK.next.next = this.headG;
+						this.headG = tempK.next;
+						tempK.next = tempK1;
+						tempK.next.killer = tempK.name;
 						done = true;
 					}
 					tempK = tempK.next;
 				}
 				//in case the victim is the last node
 				if(tempK.next.name.toLowerCase().equals(name.toLowerCase())){
-					killedName = tempK.next.name;
-					killerName = tempK.name;
+					//move killed node to graveyard
+					tempK.next.next = this.headG;
+					this.headG = tempK.next;
 					tempK.next = null;
+					this.headK.killer = tempK.name;
 				}
 			}
-			//and insert a node in front of graveyard	
-			this.headG = new AssassinNode(killedName, headG);
-			this.headG.killer = killerName;
 			}
 		}
 }
