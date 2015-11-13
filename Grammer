@@ -1,0 +1,148 @@
+//Yi He
+//11/11/2015
+//CSE 143X
+//TA:Rasika Bhalerao
+//HW #7
+//
+//This program will allow for the generation of grammars based on given rules
+import java.util.*;
+
+public class Grammar {
+	public Map<String, List<String>> ruleMap;//map to store grammer
+	private Random r = new Random();//to choose rules randomly
+	
+	//constructor of class Grammer
+	public Grammar(List<String> rules){
+		//throw an IllegalArgumentException if the list is null, or empty
+		if(rules.isEmpty() || rules.size() == 0){
+			throw new IllegalArgumentException("The list is null or empty");
+		}
+		//map to store grammer, keys are the non-terminals 
+		//values are the rules for a specific non-terminal.
+		ruleMap = new TreeMap<>();
+		//split rules and generate map
+		for(int i = 0; i< rules.size(); i++){
+			//get single line
+			String line = rules.get(i);
+			
+			//split non-terminal and rules
+			String[] pieces = line.split("::=");
+//			System.out.println("pieces[0] is " + pieces[0]);
+//			System.out.println("pieces[1] is " + pieces[1]);
+			
+			//split rules
+			List values = new ArrayList(); //empty list to concatenate rules
+			String[] rule = pieces[1].split("\\|");
+			for(int j = 0; j <rule.length; j++){
+				//System.out.println("add rule[j] :: " + rule[j]);
+				//String[] xx = rule[j].split("\\s+");
+				//System.out.println("after split :: " + xx.toString());
+				
+				//values.add(xx);
+				values.add(rule[j]);
+				//System.out.println("now values == " + values.toString());
+				//System.out.println("\n");
+				
+			}
+			
+//			System.out.println("rule is " + rule.toString());
+//			System.out.println("size of rule is " + rule.length);
+			
+			//convert String[] to List<String>
+//			List<String> temp = Arrays.asList(pieces[1]);
+//			System.out.println("temp is " + temp.toString());
+//			System.out.println("size of temp is " + temp.size());
+			
+//			List values = new ArrayList();
+//			values.addAll(temp);
+//			System.out.println("-----------------------------------------------------------");
+//			System.out.println("key is " + pieces[0]);
+//			System.out.println("values is " + values.toString());
+//			System.out.println("-----------------------------------------------------------");
+			
+			//if non-terminal in current line doesn't exist in map, add it
+			if(!this.isNonTerminal(pieces[0])){
+				this.ruleMap.put(pieces[0], values);
+//				System.out.println("#####################");
+			}
+			else{
+				//otherwise update value with concatenation of all of them
+//				List<String> currentValue = this.ruleMap.get(pieces[0]);
+//				currentValue.addAll(values);
+				this.ruleMap.get(pieces[0]).addAll(values);
+//				this.ruleMap.put(pieces[0], currentValue);
+//				System.out.println("@@@@@@@@@@@@@@@@@@@");
+			}
+		}
+//		System.out.println(this.ruleMap.toString());
+//		for(String key : this.ruleMap.keySet()){
+//			System.out.println(key + ": " + this.ruleMap.get("<adj>"));
+//		}
+		
+//		for(Map.Entry<String, List<String>> entry : this.ruleMap.entrySet())
+//		{
+//			System.out.println("Key = " + entry.getKey() + "			:: Value = " + entry.getValue());
+//		}
+		//String sss = "adj";
+		//List rst = this.ruleMap.get(sss);
+		//System.out.println(rst.toString());
+
+		
+	}
+	//method should return true if the given symbol is a non-terminal in the 
+	//grammar and false otherwise.
+	public boolean isNonTerminal(String symbol){
+		return this.ruleMap.containsKey(symbol);
+	}
+	
+	//method to return a string representing all non-terminal symbols of 
+	//the grammar in alphabetical order
+	public String toString(){
+		return this.ruleMap.keySet().toString();
+	}
+	
+	//method to generate number random occurences of the given symbol and 
+	//return them as a List<String>
+	public List<String> getRandom(int number, String nonterminal){
+		//If number is negative, throw an IllegalArgumentException
+		if(number < 0){
+			throw new IllegalArgumentException(""
+					+ "number should be non-negative");
+		}
+		//If the String argument passed is not a non-terminal in the grammar 
+		//(or it is null), throw an IllegalArgumentException
+		if(!this.isNonTerminal(nonterminal)){
+			throw new IllegalArgumentException(""
+					+ "nonterminal is not a non-terminal");
+		}
+		
+		List<String> totalResult = new ArrayList<String>(); //to store the output
+		for(int i = 0; i < number; i++){
+			totalResult.add(this.oneRun(nonterminal));
+		}		
+		return totalResult;
+	}
+	
+	//method to gengerate one line according to the rule given
+	private String oneRun(String nonterminal){
+		List<String> oneRule = ruleMap.get(nonterminal);
+		int randomRule = r.nextInt(oneRule.size());
+		String result = ""; //to store the output
+		
+//		System.out.println("oneRule.get(randomRule) is " + oneRule.get(randomRule));
+		
+		String temp = oneRule.get(randomRule);
+		String[] word = temp.split("\\s+");
+		for(int j = 0; j < word.length; j++){
+			if(!this.isNonTerminal(word[j])){
+				result += " " + word[j];
+			}
+			else{	
+				result += " " + this.oneRun(word[j]);
+			}			
+		}
+//		System.out.println("result is " + result);
+		return result.trim();
+	}
+
+}
