@@ -12,18 +12,24 @@ import java.util.*;
 public class HangmanManager {
 	private Set<String> allWords; //all (left) words with given length
 	private int max; //max number of wrong guesses player is allowed to make
-//	private int length; //target word length
+	private int length; //target word length
 	private Set<Character> guessed; // characters have been guessed
-	private Map<String, Set<String>> cur; //current patterns and families 
+	private Map<String, Set<String>> cur; //current patterns and families
+	private String curPattern; //store current pattern
 	
 	//constructor of HangmanManager to initialize the state of the game
 	public HangmanManager(List<String> dictionary, int length, int max){
-		//throw an IllegalArgumentException if length is less than 1 
-		//or if max is less than 0
+		/*throw an IllegalArgumentException if length is less than 1 
+		or if max is less than 0*/
 		if(length < 1 || max < 0){
 			throw new IllegalArgumentException("length must not be less"
 					+ "than 1 and max must not be less than 0");
 		}
+		
+		this.max = max;
+		this.length = length;
+		this.curPattern = new String(new char[length]).replace("\0", "-");
+		this.guessed = new TreeSet<Character>();
 		
 		//new set to store all words with given length
 		this.allWords = new TreeSet<String>();
@@ -35,57 +41,101 @@ public class HangmanManager {
 		}
 	}
 	
-	//method to get access to the current set of words being considered by the
-	//HangmanManager
+	/*method to get access to the current set of words being considered by the
+	HangmanManager*/
 	public Set<String> words(){
-		return allWords;
+		return this.allWords;
 	}
 	
 	//method to find out how many guesses the player has left
 	public int guessesLeft(){
-		return max;
+		return this.max;
 	}
 	
-	//method to find out the current set of letters that have been guessed 
-	//by the player
+	/*method to find out the current set of letters that have been guessed 
+	by the player*/
 	public Set<Character> guesses(){
 		return this.guessed;
 	}
 	
-	//method to find out the current pattern to be displayed for the game, 
-	//taking into account guesses that have been made.
+	/*method to find out the current pattern to be displayed for the game, 
+	taking into account guesses that have been made*/
 	public String pattern(){
 		//throw an IllegalStateException if the set of words is empty
 		if(this.allWords.isEmpty()){
 			throw new IllegalStateException("Set of words is empty!");
 		}
-		int maxSize = 0; //to store the maximum size of family
-		String maxKey = ""; //to store the key of maximum size of family
-		//go through the map to find pattern according to largest family
-		for(String key : this.cur.keySet()){
-			if(this.cur.get(key).size() > maxSize){
-				maxSize = this.cur.get(key).size();
-				maxKey = key;
-			}
-		}
-		return maxKey;
+
+		return this.curPattern;
 	}
 	
-	//method to record that the player made a guess
+	/*method to record that the player made a guess.
+	 return the number of occurrences of guessed letter in the new pattern 
+	 and it should appropriately update the number of guesses left*/
 	public int record(char guess){
-		//throw an IllegalStateException if the number of guesses left is 
-		//not at least 1 or if the list of words is empty
+		/*throw an IllegalStateException if the number of guesses left is 
+		not at least 1 or if the list of words is empty*/
 		if(this.max < 1 || this.allWords.isEmpty()){
-			throw new IllegalStateException("Number of guesses left is less than 1"
-					+ " or set of words is empty"); 
+			throw new IllegalStateException("Number of guesses left is less "
+					+ "than 1 or set of words is empty"); 
 		}
-		//throw an IllegalArgumentException if the list of words is nonempty 
-		//and the character being guessed was guessed previously
+		/*throw an IllegalArgumentException if the list of words is nonempty 
+		and the character being guessed was guessed previously*/
 		if(!this.allWords.isEmpty() && this.guessed.contains(guess)){
 			throw new IllegalArgumentException("This character has been guessed.");
 		}
 		
-		return 0;
-	}
-	
+		cur = new TreeMap<String, Set<String>>();
+		//Map between family patterns with the set of words having each pattern
+		for(String word : this.allWords){
+			String temp = word;
+			for(int i = 0; i < word.length(); i++){
+				if(temp.charAt(i) != guess){
+					temp = temp.replace(temp.charAt(i), '-');
+				}
+			}
+			if(!this.cur.containsKey(temp)){
+				this.cur.put(temp, new TreeSet<String>());
+			}
+			this.cur.get(temp).add(word);
+		}
+		
+		int maxSize = 0; //to store the maximum size of family
+		String temp = "";
+		//go through the map to find pattern according to largest family
+		for(String key : this.cur.keySet()){
+			if(this.cur.get(key).size() > maxSize){
+				maxSize = this.cur.get(key).size();
+				temp += key;
+			}
+		}
+		String tempPattern = temp.substring(temp.length() - this.length, temp.length());
+		
+		int counter = 0; //to store occurrences of guessed character in pattern
+		for(int j = 0; j < this.length; j++){
+			if(tempPattern.charAt(j) == guess){
+				counter ++;
+			}
+		}		
+		
+		if(counter == 0){
+			this.max--;
+		}
+		
+		this.allWords = this.cur.get(tempPattern);
+		
+		String combine = "";
+		for(int m = 0; m < this.length; m++){
+			if(this.curPattern.charAt(m) == '-' 
+					&& tempPattern.charAt(m) != '-'){
+				combine += tempPattern.charAt(m);
+			}
+			else{
+				combine += this.curPattern.charAt(m);
+			}
+		}
+		this.curPattern = combine;
+		this.guessed.add(guess);	
+		return counter;
+	}	
 }
