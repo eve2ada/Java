@@ -1,0 +1,91 @@
+//Yi He
+//11/17/2015
+//CSE 143X
+//TA:Rasika Bhalerao
+//HW #8
+//
+//This program will manage a game of Hangman for the generation of grammars
+//based on given rules
+
+import java.util.*;
+
+public class HangmanManager {
+	private Set<String> allWords; //all (left) words with given length
+	private int max; //max number of wrong guesses player is allowed to make
+//	private int length; //target word length
+	private Set<Character> guessed; // characters have been guessed
+	private Map<String, Set<String>> cur; //current patterns and families 
+	
+	//constructor of HangmanManager to initialize the state of the game
+	public HangmanManager(List<String> dictionary, int length, int max){
+		//throw an IllegalArgumentException if length is less than 1 
+		//or if max is less than 0
+		if(length < 1 || max < 0){
+			throw new IllegalArgumentException("length must not be less"
+					+ "than 1 and max must not be less than 0");
+		}
+		
+		//new set to store all words with given length
+		this.allWords = new TreeSet<String>();
+		//add all words with given length to set
+		for(int i = 0; i < dictionary.size(); i++){
+			if(dictionary.get(i).length() == length){
+				this.allWords.add(dictionary.get(i));
+			}
+		}
+	}
+	
+	//method to get access to the current set of words being considered by the
+	//HangmanManager
+	public Set<String> words(){
+		return allWords;
+	}
+	
+	//method to find out how many guesses the player has left
+	public int guessesLeft(){
+		return max;
+	}
+	
+	//method to find out the current set of letters that have been guessed 
+	//by the player
+	public Set<Character> guesses(){
+		return this.guessed;
+	}
+	
+	//method to find out the current pattern to be displayed for the game, 
+	//taking into account guesses that have been made.
+	public String pattern(){
+		//throw an IllegalStateException if the set of words is empty
+		if(this.allWords.isEmpty()){
+			throw new IllegalStateException("Set of words is empty!");
+		}
+		int maxSize = 0; //to store the maximum size of family
+		String maxKey = ""; //to store the key of maximum size of family
+		//go through the map to find pattern according to largest family
+		for(String key : this.cur.keySet()){
+			if(this.cur.get(key).size() > maxSize){
+				maxSize = this.cur.get(key).size();
+				maxKey = key;
+			}
+		}
+		return maxKey;
+	}
+	
+	//method to record that the player made a guess
+	public int record(char guess){
+		//throw an IllegalStateException if the number of guesses left is 
+		//not at least 1 or if the list of words is empty
+		if(this.max < 1 || this.allWords.isEmpty()){
+			throw new IllegalStateException("Number of guesses left is less than 1"
+					+ " or set of words is empty"); 
+		}
+		//throw an IllegalArgumentException if the list of words is nonempty 
+		//and the character being guessed was guessed previously
+		if(!this.allWords.isEmpty() && this.guessed.contains(guess)){
+			throw new IllegalArgumentException("This character has been guessed.");
+		}
+		
+		return 0;
+	}
+	
+}
