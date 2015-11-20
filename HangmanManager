@@ -11,7 +11,7 @@ import java.util.*;
 
 public class HangmanManager {
 	private Set<String> allWords; //all (left) words with given length
-	private int max; //max number of wrong guesses player is allowed to make
+	private int max; //current number of wrong guesses player is allowed to make
 	private int length; //target word length
 	private Set<Character> guessed; // characters have been guessed
 	private Map<String, Set<String>> cur; //current patterns and families
@@ -73,33 +73,9 @@ public class HangmanManager {
 	 return the number of occurrences of guessed letter in the new pattern 
 	 and it should appropriately update the number of guesses left*/
 	public int record(char guess){
-		/*throw an IllegalStateException if the number of guesses left is 
-		not at least 1 or if the list of words is empty*/
-		if(this.max < 1 || this.allWords.isEmpty()){
-			throw new IllegalStateException("Number of guesses left is less "
-					+ "than 1 or set of words is empty"); 
-		}
-		/*throw an IllegalArgumentException if the list of words is nonempty 
-		and the character being guessed was guessed previously*/
-		if(!this.allWords.isEmpty() && this.guessed.contains(guess)){
-			throw new IllegalArgumentException("This character has been guessed.");
-		}
-		
-		cur = new TreeMap<String, Set<String>>();
-		//Map between family patterns with the set of words having each pattern
-		for(String word : this.allWords){
-			String temp = word;
-			for(int i = 0; i < word.length(); i++){
-				if(temp.charAt(i) != guess){
-					temp = temp.replace(temp.charAt(i), '-');
-				}
-			}
-			if(!this.cur.containsKey(temp)){
-				this.cur.put(temp, new TreeSet<String>());
-			}
-			this.cur.get(temp).add(word);
-		}
-		
+		this.exceptionReport(guess);
+		//map set of words with family patterns according to guessed character
+		this.mapSetting(guess);
 		int maxSize = 0; //to store the maximum size of family
 		String temp = "";
 		//go through the map to find pattern according to largest family
@@ -122,8 +98,48 @@ public class HangmanManager {
 			this.max--;
 		}
 		
+		//update related fields comparing with pattern selected
 		this.allWords = this.cur.get(tempPattern);
+		this.update(tempPattern);
+		this.guessed.add(guess);
 		
+		return counter;
+	}
+	
+	//method to throw exception at the beginning of record method
+	public void exceptionReport(char guess){
+		/*throw an IllegalStateException if the number of guesses left is 
+		not at least 1 or if the list of words is empty*/
+		if(this.max < 1 || this.allWords.isEmpty()){
+			throw new IllegalStateException("Number of guesses left is less "
+					+ "than 1 or set of words is empty"); 
+		}
+		/*throw an IllegalArgumentException if the list of words is nonempty 
+		and the character being guessed was guessed previously*/
+		if(!this.allWords.isEmpty() && this.guessed.contains(guess)){
+			throw new IllegalArgumentException("This character has been guessed.");
+		}
+	}
+	
+	//method to map set of words with family patterns according to guessed character
+	public void mapSetting(char guess){
+		cur = new TreeMap<String, Set<String>>();
+		for(String word : this.allWords){
+			String temp = word;
+			for(int i = 0; i < word.length(); i++){
+				if(temp.charAt(i) != guess){
+					temp = temp.replace(temp.charAt(i), '-');
+				}
+			}
+			if(!this.cur.containsKey(temp)){
+				this.cur.put(temp, new TreeSet<String>());
+			}
+			this.cur.get(temp).add(word);
+		}
+	}
+	
+	//method to update curPattern fields comparing with pattern selected
+	public void update(String tempPattern){
 		String combine = "";
 		for(int m = 0; m < this.length; m++){
 			if(this.curPattern.charAt(m) == '-' 
@@ -134,8 +150,6 @@ public class HangmanManager {
 				combine += this.curPattern.charAt(m);
 			}
 		}
-		this.curPattern = combine;
-		this.guessed.add(guess);	
-		return counter;
-	}	
+		this.curPattern = combine.trim();
+	}
 }
