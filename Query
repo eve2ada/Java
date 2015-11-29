@@ -321,6 +321,7 @@ public class Query {
 				while (countOfGivenFlight.next()){
 					count_Itinerary = countOfGivenFlight.getInt("ct");
 				}
+				countOfGivenFlight.close();
 				
 				//make sure a customer may have at most one reservation for any given day
 				getBookedItinerary.clearParameters();
@@ -331,6 +332,7 @@ public class Query {
 				while(countOfGivenUser.next()){
 					count_User = countOfGivenUser.getInt("ct");
 				}
+				countOfGivenUser.close();
 				
 				if(count_Itinerary >= MAX_CAPACITY){
 					System.out.println("All tickets of this flight are booked. Please choose other flight.");
@@ -348,6 +350,7 @@ public class Query {
 					while(countOfReservation.next()){
 						reservation_ID = countOfReservation.getInt("ct");
 					}
+					countOfReservation.close();
 					
 					//book ticket
 					reserveTicket.clearParameters();
@@ -369,6 +372,8 @@ public class Query {
 //					this.cid = -1;
 				}
 			}
+			infoOfItineraryResults.close();
+			
 		}
 	}
 
@@ -395,7 +400,8 @@ public class Query {
 				
 	            System.out.println(reservation_ID + ". User: " + userID + " Flight: " + year + "," + month_id + "," + day_of_month
 	            		+ "," + carrier_id + "," + flight_num + "," + origin_city + "," + actual_time);
-			}
+	         }
+			reservationList.close();
 		}
 	}
 
@@ -413,6 +419,7 @@ public class Query {
 			while(countOfValidRecord.next()){
 				count_ValidRecord = countOfValidRecord.getInt("ct");
 			}
+			countOfValidRecord.close();
 			
 			if(count_ValidRecord != 1){
 				System.out.println("This is not a valid reservationId, please input again.");
