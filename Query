@@ -85,8 +85,18 @@ public class Query {
 	private PreparedStatement listReservation;
 	
 	//to get number of records of current reservation table
-	private static final String COUNT_RESERVATION = "SELECT COUNT(*) AS ct FROM Reservation";
-	private PreparedStatement getCountOfReservation;
+	private static final String COUNT_RESERVATION = "SELECT MAX(reservation_ID) AS ct FROM Reservation";
+	private PreparedStatement getMaxOfReservationID;
+	
+	//to check if a given reservationId is valid
+	private static final String CHECK_RESERVATIONID = "SELECT COUNT(*) AS ct FROM Reservation "
+			+ "WHERE reservation_ID = ?";
+	private PreparedStatement checkReservation;
+	
+	//to delete record from Reservation table with given reservationId
+	private static final String DELETE_RESERVATION = "DELETE FROM Reservation "
+			+ "WHERE reservation_ID = ?";
+	private PreparedStatement deleteReservation;
 	
 	// transactions
 	private static final String BEGIN_TRANSACTION_SQL =  
@@ -164,7 +174,11 @@ public class Query {
 		//list all reservations
 		listReservation = conn.prepareStatement(LIST_RESERVATION);
 		//get count of records in reservation
-		getCountOfReservation = conn.prepareStatement(COUNT_RESERVATION);
+		getMaxOfReservationID = conn.prepareStatement(COUNT_RESERVATION);
+		//check record with given reservation_Id is valid
+		checkReservation = conn.prepareStatement(CHECK_RESERVATIONID);
+		//delete record with given reservation_Id
+		deleteReservation = conn.prepareStatement(DELETE_RESERVATION);
 	}
 	
 	public void transaction_login(String username, String password) throws Exception {
@@ -329,8 +343,8 @@ public class Query {
 					conn.setAutoCommit(false);
 					conn.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
 					//get current number of records in reservation
-					getCountOfReservation.clearParameters();
-					ResultSet countOfReservation = getCountOfReservation.executeQuery();
+					getMaxOfReservationID.clearParameters();
+					ResultSet countOfReservation = getMaxOfReservationID.executeQuery();
 					while(countOfReservation.next()){
 						reservation_ID = countOfReservation.getInt("ct");
 					}
@@ -360,28 +374,60 @@ public class Query {
 
 	public void transaction_reservations() throws Exception {
 		// Add code here
-		listReservation.clearParameters();
-		listReservation.setInt(1, this.cid);
-		ResultSet reservationList = listReservation.executeQuery();
-		
-		while(reservationList.next()){
-			int reservation_ID = reservationList.getInt("reservation_ID");
-			int userID = reservationList.getInt("userID");
-			int year = reservationList.getInt("year");
-			int month_id = reservationList.getInt("month_id");
-			int day_of_month = reservationList.getInt("day_of_month");
-			String carrier_id = reservationList.getString("carrier_id");
-			int flight_num = reservationList.getInt("flight_num");
-			String origin_city = reservationList.getString("origin_city");
-			int actual_time = reservationList.getInt("actual_time");
+		if(this.cid == -1){
+			System.out.println("Please log in before viewing reservations.");
+		}
+		else{
+			listReservation.clearParameters();
+			listReservation.setInt(1, this.cid);
+			ResultSet reservationList = listReservation.executeQuery();
 			
-            System.out.println(reservation_ID + ". User: " + userID + " Flight: " + year + "," + month_id + "," + day_of_month
-            		+ "," + carrier_id + "," + flight_num + "," + origin_city + "," + actual_time);
+			while(reservationList.next()){
+				int reservation_ID = reservationList.getInt("reservation_ID");
+				int userID = reservationList.getInt("userID");
+				int year = reservationList.getInt("year");
+				int month_id = reservationList.getInt("month_id");
+				int day_of_month = reservationList.getInt("day_of_month");
+				String carrier_id = reservationList.getString("carrier_id");
+				int flight_num = reservationList.getInt("flight_num");
+				String origin_city = reservationList.getString("origin_city");
+				int actual_time = reservationList.getInt("actual_time");
+				
+	            System.out.println(reservation_ID + ". User: " + userID + " Flight: " + year + "," + month_id + "," + day_of_month
+	            		+ "," + carrier_id + "," + flight_num + "," + origin_city + "," + actual_time);
+			}
 		}
 	}
 
 	public void transaction_cancel(int reservationId) throws Exception {
-               // Add code here
+		// Add code here
+		if(this.cid == -1){
+			System.out.println("Please log in before canceling.");
+		}
+		else{
+			//check if reservationId is valid
+			checkReservation.clearParameters();
+			checkReservation.setInt(1, reservationId);
+			ResultSet countOfValidRecord = checkReservation.executeQuery();
+			int count_ValidRecord = 0;
+			while(countOfValidRecord.next()){
+				count_ValidRecord = countOfValidRecord.getInt("ct");
+			}
+			
+			if(count_ValidRecord != 1){
+				System.out.println("This is not a valid reservationId, please input again.");
+			}
+			//then cancel this reservation
+			else{
+				conn.setAutoCommit(false);
+				conn.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+				deleteReservation.clearParameters();
+				deleteReservation.setInt(1, reservationId);
+				deleteReservation.executeUpdate();				
+				conn.commit();
+				conn.setAutoCommit(true); 	
+			}
+		}
 	}
 
     
