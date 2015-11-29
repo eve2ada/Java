@@ -84,6 +84,10 @@ public class Query {
 			+ "WHERE userID = ?";
 	private PreparedStatement listReservation;
 	
+	//to get number of records of current SearchResult table
+	private static final String COUNT_RESEARCH_RESULT = "SELECT MAX(itineraryid) AS ct FROM SearchResult ";
+	private PreparedStatement getMaxOfSearchResult;
+	
 	//to get number of records of current reservation table
 	private static final String COUNT_RESERVATION = "SELECT MAX(reservation_ID) AS ct FROM Reservation";
 	private PreparedStatement getMaxOfReservationID;
@@ -173,6 +177,8 @@ public class Query {
 		reserveTicket = conn.prepareStatement(RESERVE_TICKET);
 		//list all reservations
 		listReservation = conn.prepareStatement(LIST_RESERVATION);
+		//get count of records in SearchResult
+		getMaxOfSearchResult = conn.prepareStatement(COUNT_RESEARCH_RESULT);
 		//get count of records in reservation
 		getMaxOfReservationID = conn.prepareStatement(COUNT_RESERVATION);
 		//check record with given reservation_Id is valid
@@ -297,79 +303,93 @@ public class Query {
 			getInfoOfItinerary.clearParameters();
 			getInfoOfItinerary.setInt(1, itineraryId);
 			ResultSet infoOfItineraryResults = getInfoOfItinerary.executeQuery();
+			
+			//make sure the requested book number is valid
+			getMaxOfSearchResult.clearParameters();
+			ResultSet countOfSearchResult = getMaxOfSearchResult.executeQuery();
+			int count_search_result = 0;
+			while(countOfSearchResult.next()){
+				count_search_result = countOfSearchResult.getInt("ct"); 
+			}
+
+			if(count_search_result < itineraryId){
+				System.out.println("Please input valid itineraryId.");
+			}
 			//then get information of given itinerary
 			//get userID from login info
-			int result_userID = this.cid;
-			while(infoOfItineraryResults.next()){
-				int result_year = infoOfItineraryResults.getInt("year");
-				int result_month = infoOfItineraryResults.getInt("month_id");
-				int result_dayofMonth = infoOfItineraryResults.getInt("day_of_month");
-				String result_cid = infoOfItineraryResults.getString("carrier_id");
-				int result_flightNum = infoOfItineraryResults.getInt("flight_num");
-				String result_originCity = infoOfItineraryResults.getString("origin_city");
-				int result_actualTime = infoOfItineraryResults.getInt("actual_time");
-				
-				//make sure the max capacity of each flight has not be reached
-				getBookedFlights.clearParameters();
-				getBookedFlights.setInt(1, result_dayofMonth);
-				getBookedFlights.setString(2, result_cid);
-				getBookedFlights.setInt(3, result_flightNum);
-				getBookedFlights.setString(4, result_originCity);
-				ResultSet countOfGivenFlight = getBookedFlights.executeQuery();
-				
-				int count_Itinerary = 0;
-				while (countOfGivenFlight.next()){
-					count_Itinerary = countOfGivenFlight.getInt("ct");
-				}
-				countOfGivenFlight.close();
-				
-				//make sure a customer may have at most one reservation for any given day
-				getBookedItinerary.clearParameters();
-				getBookedItinerary.setInt(1, result_userID);
-				getBookedItinerary.setInt(2, result_dayofMonth);
-				ResultSet countOfGivenUser = getBookedItinerary.executeQuery();
-				int count_User = 0;
-				while(countOfGivenUser.next()){
-					count_User = countOfGivenUser.getInt("ct");
-				}
-				countOfGivenUser.close();
-				
-				if(count_Itinerary >= MAX_CAPACITY){
-					System.out.println("All tickets of this flight are booked. Please choose other flight.");
-				}		
-				else if(count_User > 0){
-					System.out.println("You have reserved one itinerary on this day.");
-				}
-				else{
-					//then begin booking
-					conn.setAutoCommit(false);
-					conn.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
-					//get current number of records in reservation
-					getMaxOfReservationID.clearParameters();
-					ResultSet countOfReservation = getMaxOfReservationID.executeQuery();
-					while(countOfReservation.next()){
-						reservation_ID = countOfReservation.getInt("ct");
+			else{
+				int result_userID = this.cid;
+				while(infoOfItineraryResults.next()){
+					int result_year = infoOfItineraryResults.getInt("year");
+					int result_month = infoOfItineraryResults.getInt("month_id");
+					int result_dayofMonth = infoOfItineraryResults.getInt("day_of_month");
+					String result_cid = infoOfItineraryResults.getString("carrier_id");
+					int result_flightNum = infoOfItineraryResults.getInt("flight_num");
+					String result_originCity = infoOfItineraryResults.getString("origin_city");
+					int result_actualTime = infoOfItineraryResults.getInt("actual_time");
+					
+					//make sure the max capacity of each flight has not be reached
+					getBookedFlights.clearParameters();
+					getBookedFlights.setInt(1, result_dayofMonth);
+					getBookedFlights.setString(2, result_cid);
+					getBookedFlights.setInt(3, result_flightNum);
+					getBookedFlights.setString(4, result_originCity);
+					ResultSet countOfGivenFlight = getBookedFlights.executeQuery();
+					
+					int count_Itinerary = 0;
+					while (countOfGivenFlight.next()){
+						count_Itinerary = countOfGivenFlight.getInt("ct");
 					}
-					countOfReservation.close();
+					countOfGivenFlight.close();
 					
-					//book ticket
-					reserveTicket.clearParameters();
-					reservation_ID ++;
-					reserveTicket.setInt(1, reservation_ID);
-					reserveTicket.setInt(2, result_userID);
-					reserveTicket.setInt(3, result_year);
-					reserveTicket.setInt(4, result_month);
-					reserveTicket.setInt(5, result_dayofMonth);
-					reserveTicket.setString(6, result_cid);
-					reserveTicket.setInt(7, result_flightNum);
-					reserveTicket.setString(8, result_originCity);
-					reserveTicket.setInt(9, result_actualTime);
-					
-					reserveTicket.executeUpdate();
-					
-					conn.commit();
-					this.conn.setAutoCommit(true); 	
-//					this.cid = -1;
+					//make sure a customer may have at most one reservation for any given day
+					getBookedItinerary.clearParameters();
+					getBookedItinerary.setInt(1, result_userID);
+					getBookedItinerary.setInt(2, result_dayofMonth);
+					ResultSet countOfGivenUser = getBookedItinerary.executeQuery();
+					int count_User = 0;
+					while(countOfGivenUser.next()){
+						count_User = countOfGivenUser.getInt("ct");
+					}
+					countOfGivenUser.close();
+								
+					if(count_Itinerary >= MAX_CAPACITY){
+						System.out.println("All tickets of this flight are booked. Please choose other flight.");
+					}		
+					else if(count_User > 0){
+						System.out.println("You have reserved one itinerary on this day.");
+					}
+					else{
+						//then begin booking
+						conn.setAutoCommit(false);
+						conn.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+						//get current number of records in reservation
+						getMaxOfReservationID.clearParameters();
+						ResultSet countOfReservation = getMaxOfReservationID.executeQuery();
+						while(countOfReservation.next()){
+							reservation_ID = countOfReservation.getInt("ct");
+						}
+						countOfReservation.close();
+						
+						//book ticket
+						reserveTicket.clearParameters();
+						reservation_ID ++;
+						reserveTicket.setInt(1, reservation_ID);
+						reserveTicket.setInt(2, result_userID);
+						reserveTicket.setInt(3, result_year);
+						reserveTicket.setInt(4, result_month);
+						reserveTicket.setInt(5, result_dayofMonth);
+						reserveTicket.setString(6, result_cid);
+						reserveTicket.setInt(7, result_flightNum);
+						reserveTicket.setString(8, result_originCity);
+						reserveTicket.setInt(9, result_actualTime);
+						
+						reserveTicket.executeUpdate();
+						
+						conn.commit();
+						this.conn.setAutoCommit(true); 	
+	//					this.cid = -1;
+					}
 				}
 			}
 			infoOfItineraryResults.close();
