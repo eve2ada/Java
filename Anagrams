@@ -1,0 +1,118 @@
+//Yi He
+//11/29/2015
+//CSE 143X
+//TA:Rasika Bhalerao
+//HW #9
+//
+//This program will uses a dictionary to find all combinations of words that
+//have the same letters as a given phrase
+
+import java.util.*;
+
+public class Anagrams {
+	private List<String> dic;	
+	//map between letters and their numbers in dictionary
+	private Map<LetterInventory, List<String>> cur; 
+	
+	private List<String> result; // list for output
+	private LetterInventory inventory; //total letters from dictionary
+	private LetterInventory curInventory;//current letter inventory
+	
+	//constructor of Anagrams, to initialize a new Anagrams object that will
+	//use the given list as its dictionary.
+	public Anagrams(List<String> dictionary){
+		this.dic = dictionary;
+		this.result = new ArrayList<String>();
+//		System.out.println("This is dictionary " + dictionary.toString());
+		//map between letters and their numbers in dictionary
+		this.cur = new HashMap<LetterInventory, List<String>>();
+		for(String word: dictionary){
+			LetterInventory tempInventory = new LetterInventory(word);
+			if(!this.cur.containsKey(tempInventory)){
+				List<String> tempList = new ArrayList<String>();
+				tempList.add(word);
+				this.cur.put(tempInventory, tempList);
+			}
+			else{
+				this.cur.get(tempInventory).add(word);
+			}
+		}
+		System.out.println("This is cur " + this.cur.toString());
+	}
+	
+	//to use recursive backtracking to find combinations of words that have 
+	//the same letters as the given string
+	public void print(String s, int max){
+		//throw an IllegalArgumentException if max is less than 0
+		if(max < 0){
+			throw new IllegalArgumentException("Invalid max.");
+		}
+		//generate targetInventory from given string
+//		LetterInventory targetInventory = new LetterInventory(s);
+		
+		//define a List for pruned dictionary
+		List<String> prunedDic = new ArrayList<String>();
+			
+		//prune the letter inventory for performance
+//		System.out.println("This is curInventory " + this.curInventory.toString());
+//		System.out.println("This is targetInventory " + targetInventory.toString());
+		prunedDic = this.pruneDictionary(this.cur, s);
+		System.out.println("prunedDic is " + prunedDic);
+		
+		//generate letter inventory for s
+		LetterInventory sInventory = new LetterInventory(s);
+		
+		//if(prunedDic.isEmpty())
+		this.printRecursion(prunedDic, max, sInventory);
+		this.result.clear();
+	}
+	
+	//method for recursion
+	private void printRecursion(List<String> prunedDic, int max, 
+									LetterInventory sInventory){
+		//define a List for output
+//		List<String> result = new ArrayList<String>();		
+			
+		//if prunedDic list is empty or result has same to 
+		//or more than max words, recursion ends
+		if(sInventory != null){
+			if(sInventory.isEmpty()){
+				System.out.println("####"+ this.result);
+			}
+			else if(max != 0 && result.size() >= max){
+				System.out.println("****"+ this.result);
+			}
+			else{
+				for(String word : prunedDic){
+	//				System.out.println("initial result is " + result);
+					this.result.add(word);
+					LetterInventory wordInventory = new LetterInventory(word);
+
+					this.printRecursion(prunedDic, max, sInventory.subtract(wordInventory));
+					sInventory.add(wordInventory);
+					this.result.remove(word);
+				}
+			}
+		}
+	}
+	
+	//method to prune dictionary
+	private List<String> pruneDictionary(Map<LetterInventory, List<String>>
+										curMap, String s){
+		//generate Letter Inventory for s
+		LetterInventory sInventory = new LetterInventory(s);
+		//list for output
+		List<String> prunedDic = new ArrayList<String>();
+		//go through all keys in map
+		System.out.println("keyset is " + curMap.keySet());
+		for(LetterInventory key: curMap.keySet()){
+			if(sInventory.subtract(key) != null){
+				//sInventory contains key, add all related words to prunedDic
+				prunedDic.addAll(curMap.get(key));
+			}
+		}
+		return prunedDic;
+	}
+	
+
+}
