@@ -13,18 +13,14 @@ public class Anagrams {
 	private List<String> dic;	
 	//map between letters and their numbers in dictionary
 	private Map<String, LetterInventory> cur; 
-	
 	private List<String> result; // list for output
-//	private LetterInventory inventory; //total letters from dictionary
-//	private LetterInventory curInventory;//current letter inventory
 	
 	//constructor of Anagrams, to initialize a new Anagrams object that will
 	//use the given list as its dictionary.
 	public Anagrams(List<String> dictionary){
 		this.dic = dictionary;
 		this.result = new ArrayList<String>();
-//		System.out.println("This is dictionary " + dictionary.toString());
-		//map between letters and their numbers in dictionary
+		//map between words and their inventories
 		this.cur = new HashMap<String, LetterInventory>();
 		for(String word: dictionary){
 			LetterInventory tempInventory = new LetterInventory(word);
@@ -32,7 +28,6 @@ public class Anagrams {
 				this.cur.put(word, tempInventory);
 			}
 		}
-//		System.out.println("This is cur " + this.cur.toString());
 	}
 	
 	//to use recursive backtracking to find combinations of words that have 
@@ -42,20 +37,16 @@ public class Anagrams {
 		if(max < 0){
 			throw new IllegalArgumentException("Invalid max.");
 		}
-		//generate targetInventory from given string
-//		LetterInventory targetInventory = new LetterInventory(s);
-		
+	
 		//define a List for pruned dictionary
 		List<String> prunedDic = new ArrayList<String>();
 			
 		//prune the letter inventory for performance
-//		System.out.println("This is curInventory " + this.curInventory.toString());
-//		System.out.println("This is targetInventory " + targetInventory.toString());
 		prunedDic = this.pruneDictionary(this.dic, s);
-//		System.out.println("prunedDic is " + prunedDic);
 		
 		//generate letter inventory for s
 		LetterInventory sInventory = new LetterInventory(s);
+		//if sInventory is empty, print out directly
 		if(sInventory.isEmpty()){
 			System.out.println("[]");
 		}
@@ -68,16 +59,13 @@ public class Anagrams {
 	//method for recursion
 	private void printRecursion(List<String> prunedDic, int max, 
 									LetterInventory sInventory){
-		//define a List for output
-//		List<String> result = new ArrayList<String>();		
-			
-		//if prunedDic list is empty or result has same to 
-		//or more than max words, recursion ends
+		//temporary inventory to store current target inventory 
 		LetterInventory tempInventory = sInventory;
-//		boolean isMax = false; // to indicate if max number is reached
+		//go through all words in prunedDic to match s
 		for(String word : prunedDic){
 			tempInventory = sInventory.subtract(this.cur.get(word));				
 			if(tempInventory != null){
+				//current target inventory is empty, print out
 				if(tempInventory.isEmpty()){
 					if(max == 0 || this.result.size() < max){
 						this.result.add(word);
@@ -85,13 +73,10 @@ public class Anagrams {
 						this.result.remove(word);
 					}
 				}
-//					else if(max != 0 && result.size() == max){
-//						isMax = true;
-//						System.out.println(this.result);
-//					}
+				//current target inventory is not empty, try to add next word
+				//and recurse
 				else{
 					this.result.add(word);
-
 					tempInventory = sInventory.subtract(this.cur.get(word));
 					this.printRecursion(prunedDic, max, tempInventory);
 				}
@@ -99,9 +84,7 @@ public class Anagrams {
 			}
 			else{
 				tempInventory = sInventory;
-//				this.result.remove(word);
 			}
-//			this.result.remove(word);
 		}
 
 	}
@@ -113,7 +96,6 @@ public class Anagrams {
 		//list for output
 		List<String> prunedDic = new ArrayList<String>();
 		//go through all word in dictionary
-//		System.out.println("dictionary is " + dic);
 		for(String word : dic){
 			LetterInventory wInventory = this.cur.get(word);
 			//if word is relevant to s, add to prunedDic
@@ -123,6 +105,4 @@ public class Anagrams {
 		}
 		return prunedDic;
 	}
-	
-
 }
