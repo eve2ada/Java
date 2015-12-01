@@ -12,11 +12,11 @@ import java.util.*;
 public class Anagrams {
 	private List<String> dic;	
 	//map between letters and their numbers in dictionary
-	private Map<LetterInventory, List<String>> cur; 
+	private Map<String, LetterInventory> cur; 
 	
 	private List<String> result; // list for output
-	private LetterInventory inventory; //total letters from dictionary
-	private LetterInventory curInventory;//current letter inventory
+//	private LetterInventory inventory; //total letters from dictionary
+//	private LetterInventory curInventory;//current letter inventory
 	
 	//constructor of Anagrams, to initialize a new Anagrams object that will
 	//use the given list as its dictionary.
@@ -25,19 +25,14 @@ public class Anagrams {
 		this.result = new ArrayList<String>();
 //		System.out.println("This is dictionary " + dictionary.toString());
 		//map between letters and their numbers in dictionary
-		this.cur = new HashMap<LetterInventory, List<String>>();
+		this.cur = new HashMap<String, LetterInventory>();
 		for(String word: dictionary){
 			LetterInventory tempInventory = new LetterInventory(word);
-			if(!this.cur.containsKey(tempInventory)){
-				List<String> tempList = new ArrayList<String>();
-				tempList.add(word);
-				this.cur.put(tempInventory, tempList);
-			}
-			else{
-				this.cur.get(tempInventory).add(word);
+			if(!this.cur.containsKey(word)){
+				this.cur.put(word, tempInventory);
 			}
 		}
-		System.out.println("This is cur " + this.cur.toString());
+//		System.out.println("This is cur " + this.cur.toString());
 	}
 	
 	//to use recursive backtracking to find combinations of words that have 
@@ -56,15 +51,18 @@ public class Anagrams {
 		//prune the letter inventory for performance
 //		System.out.println("This is curInventory " + this.curInventory.toString());
 //		System.out.println("This is targetInventory " + targetInventory.toString());
-		prunedDic = this.pruneDictionary(this.cur, s);
-		System.out.println("prunedDic is " + prunedDic);
+		prunedDic = this.pruneDictionary(this.dic, s);
+//		System.out.println("prunedDic is " + prunedDic);
 		
 		//generate letter inventory for s
 		LetterInventory sInventory = new LetterInventory(s);
-		
-		//if(prunedDic.isEmpty())
-		this.printRecursion(prunedDic, max, sInventory);
-		this.result.clear();
+		if(sInventory.isEmpty()){
+			System.out.println("[]");
+		}
+		else{
+			this.printRecursion(prunedDic, max, sInventory);
+			this.result.clear();
+		}
 	}
 	
 	//method for recursion
@@ -75,41 +73,53 @@ public class Anagrams {
 			
 		//if prunedDic list is empty or result has same to 
 		//or more than max words, recursion ends
-		if(sInventory != null){
-			if(sInventory.isEmpty()){
-				System.out.println("####"+ this.result);
-			}
-			else if(max != 0 && result.size() >= max){
-				System.out.println("****"+ this.result);
+		LetterInventory tempInventory = sInventory;
+//		boolean isMax = false; // to indicate if max number is reached
+		for(String word : prunedDic){
+			tempInventory = sInventory.subtract(this.cur.get(word));				
+			if(tempInventory != null){
+				if(tempInventory.isEmpty()){
+					if(max == 0 || this.result.size() < max){
+						this.result.add(word);
+						System.out.println(this.result);
+						this.result.remove(word);
+					}
+				}
+//					else if(max != 0 && result.size() == max){
+//						isMax = true;
+//						System.out.println(this.result);
+//					}
+				else{
+					this.result.add(word);
+
+					tempInventory = sInventory.subtract(this.cur.get(word));
+					this.printRecursion(prunedDic, max, tempInventory);
+				}
+				this.result.remove(word);
 			}
 			else{
-				for(String word : prunedDic){
-	//				System.out.println("initial result is " + result);
-					this.result.add(word);
-					LetterInventory wordInventory = new LetterInventory(word);
-
-					this.printRecursion(prunedDic, max, sInventory.subtract(wordInventory));
-					sInventory.add(wordInventory);
-					this.result.remove(word);
-				}
+				tempInventory = sInventory;
+//				this.result.remove(word);
 			}
+//			this.result.remove(word);
 		}
+
 	}
 	
 	//method to prune dictionary
-	private List<String> pruneDictionary(Map<LetterInventory, List<String>>
-										curMap, String s){
+	private List<String> pruneDictionary(List<String> dic, String s){
 		//generate Letter Inventory for s
 		LetterInventory sInventory = new LetterInventory(s);
 		//list for output
 		List<String> prunedDic = new ArrayList<String>();
-		//go through all keys in map
-		System.out.println("keyset is " + curMap.keySet());
-		for(LetterInventory key: curMap.keySet()){
-			if(sInventory.subtract(key) != null){
-				//sInventory contains key, add all related words to prunedDic
-				prunedDic.addAll(curMap.get(key));
-			}
+		//go through all word in dictionary
+//		System.out.println("dictionary is " + dic);
+		for(String word : dic){
+			LetterInventory wInventory = this.cur.get(word);
+			//if word is relevant to s, add to prunedDic
+			if(sInventory.subtract(wInventory) != null){
+				prunedDic.add(word);
+			}			
 		}
 		return prunedDic;
 	}
