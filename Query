@@ -62,17 +62,12 @@ public class Query {
 	private static final String LOG_IN = "SELECT userID FROM Customer WHERE fullname = ? AND pwd = ?";
 	private PreparedStatement logIn;
 	//to save current search result to SearchResult table
-	private static final String VACATE_SEARCHRESULT = "DELETE FROM SearchResult";
+	private static final String VACATE_SEARCHRESULT = "DELETE FROM SearchResult WHERE userID = ? OR userID = -1";
 	private PreparedStatement vacateSearchResult;
 	//then insert new values into SearchResult table
 	private static final String INSERT_SEARCHRESULT = 
 			"INSERT into SearchResult values(?,?,?,?,?,?,?,?,?)";
 	private PreparedStatement insertSearchResult;
-	
-	//to get information of given itinerary
-	private static final String INFO_ITINERARY = 
-			"SELECT * FROM SearchResult WHERE itineraryid = ? AND userID = ?";
-	private PreparedStatement getInfoOfItinerary;
 	
 	//to get current number of booked tickets for given itinerary
 	private static final String COUNT_BOOKED = 
@@ -96,10 +91,24 @@ public class Query {
 			+ "WHERE userID = ?";
 	private PreparedStatement listReservation;
 	
-	//to get number of records of current SearchResult table
-	private static final String COUNT_RESEARCH_RESULT = "SELECT count(*) AS ct FROM SearchResult ";
-	private PreparedStatement getMaxOfSearchResult;
+	//to get information of given itinerary
+	private static final String INFO_ITINERARY = 
+			"SELECT * FROM SearchResult WHERE itineraryid = ? AND userID = ?";
+	private PreparedStatement getInfoOfItinerary;
 	
+	//to get count of records with given itineraryid and userID
+	private static final String COUNT_ITINERARY = "SELECT COUNT(*) AS ct "
+			+ "FROM SearchResult WHERE itineraryid = ? AND userID = ?";
+	private PreparedStatement getCountOfItinerary;
+	
+	//to get number of all records of current SearchResult table
+	private static final String COUNT_RESEARCH_RESULT = "SELECT count(*) AS ct FROM SearchResult ";
+	private PreparedStatement getCountOfSearchResult;
+	
+	//to get max id of records of current SearchResult table
+	private static final String MAX_RESEARCH_RESULT = "SELECT MAX(itineraryid) AS ct FROM SearchResult ";
+	private PreparedStatement getMaxOfSearchResult;
+
 	//to get number of records of current SearchResult table related to current user
 	private static final String COUNT_RESEARCH_RESULT_USER = "SELECT count(*) AS ct FROM SearchResult WHERE userID = ?";
 	private PreparedStatement getCountOfSearchResult_user;
@@ -187,6 +196,8 @@ public class Query {
 		
 		//run a query to get information of given itinerary
 		getInfoOfItinerary = conn.prepareStatement(INFO_ITINERARY);
+		//run a query to get count of given itinerary and user
+		getCountOfItinerary = conn.prepareStatement(COUNT_ITINERARY);
 		//run a query to get current number of booked tickets for given flight
 		getBookedFlights = conn.prepareStatement(COUNT_BOOKED);
 		//run a query to get current number of booked itinerary for given user and day
@@ -196,7 +207,8 @@ public class Query {
 		//list all reservations
 		listReservation = conn.prepareStatement(LIST_RESERVATION);
 		//get count of records in SearchResult
-		getMaxOfSearchResult = conn.prepareStatement(COUNT_RESEARCH_RESULT);
+		getCountOfSearchResult = conn.prepareStatement(COUNT_RESEARCH_RESULT);
+		getMaxOfSearchResult = conn.prepareStatement(MAX_RESEARCH_RESULT);
 		getCountOfSearchResult_user = conn.prepareStatement(COUNT_RESEARCH_RESULT_USER);
 		//get count of records in reservation
 		getMaxOfReservationID = conn.prepareStatement(COUNT_RESERVATION);
@@ -227,7 +239,22 @@ public class Query {
 	 * Prints the results found by the search.
 	 */
 	public void transaction_search_safe(String originCity, String destinationCity, boolean directFlight, int dayOfMonth, int numberOfItineraries) throws Exception {
-		int rowID = 0;
+//		int rowID = 0;
+		this.beginTransaction();
+		//vacate searchResult table
+		vacateSearchResult.clearParameters();
+		vacateSearchResult.setInt(1, this.cid);
+		vacateSearchResult.executeUpdate();
+		
+		//get current max rowID of SearchResult table
+		getMaxOfSearchResult.clearParameters();
+		ResultSet count_SearchResult_all = getMaxOfSearchResult.executeQuery();
+		int count_allSearchResult = 0;
+		while(count_SearchResult_all.next()){
+			count_allSearchResult = count_SearchResult_all.getInt("ct");
+		}
+		
+		int rowID = count_allSearchResult;
 		// direct itineraries
 		searchOneHopStatement.clearParameters();
 		searchOneHopStatement.setInt(1, numberOfItineraries);
@@ -236,9 +263,6 @@ public class Query {
 		searchOneHopStatement.setInt(4, dayOfMonth);
 		ResultSet oneHopResults = searchOneHopStatement.executeQuery();
 
-		//vacate searchResult table
-		vacateSearchResult.executeUpdate();
-		
 		while (oneHopResults.next()) {
 	        int result_year = oneHopResults.getInt("year");
 	       	        
@@ -250,7 +274,6 @@ public class Query {
 	        int result_time = oneHopResults.getInt("actual_time");                   
 	        rowID ++;
 	        
-	        this.beginTransaction();
 	        //insert value to searchResult table
 	        insertSearchResult.clearParameters();
 	        insertSearchResult.setInt(1, rowID);
@@ -263,18 +286,18 @@ public class Query {
 	        insertSearchResult.setInt(8, result_time);
 	        insertSearchResult.setInt(9, this.cid);
 	        insertSearchResult.executeUpdate();
-	        this.commitTransaction();
-	        
+	        	        
 	        System.out.println(rowID + ". Flight(s) Included: 1, " + result_year + "," + result_monthId + "," + result_dayOfMonth + "," + result_carrierId + "," + result_flightNum + "," + result_originCity + "," + result_time);
   		}
-		oneHopResults.close();		
+		oneHopResults.close();
 		
 		// Add code here
 		//if the number of research results is less than numberOfItineraries 
 		//and one-hop itinerary is allowed(directFlight=false), begin search for one-hop itinerary
 		if(directFlight == false){
-			getMaxOfSearchResult.clearParameters();
-			ResultSet currentSearchResult = getMaxOfSearchResult.executeQuery();
+			getCountOfSearchResult_user.clearParameters();
+			getCountOfSearchResult_user.setInt(1, this.cid);
+			ResultSet currentSearchResult = getCountOfSearchResult_user.executeQuery();
 			
 			int count_SearchResult = 0; // store current number of records in search result table
 			while(currentSearchResult.next()){
@@ -298,10 +321,8 @@ public class Query {
 			        String result_flightNum = searchNotDirectResult.getString("flight_num");
 			        String result_originCity = searchNotDirectResult.getString("origin_city");
 			        int result_time = searchNotDirectResult.getInt("actual_time");  
-//			        System.out.println("total actual_time is " + result_time);
 			        rowID ++;
 			        
-			        this.beginTransaction();
 			        //insert value to searchResult table
 			        insertSearchResult.clearParameters();
 			        insertSearchResult.setInt(1, rowID);
@@ -314,7 +335,7 @@ public class Query {
 			        insertSearchResult.setInt(8, result_time);
 			        insertSearchResult.setInt(9, this.cid);
 			        insertSearchResult.executeUpdate();
-			        this.commitTransaction();
+			        
 //			        insertSearchResult.close();
 			        
 			        System.out.println(rowID + ". Flight(s) Included: 2, " + result_year + "," + result_monthId + "," + result_dayOfMonth + "," + result_carrierId + "," + result_flightNum + "," + result_originCity + "," + result_time);
@@ -325,8 +346,9 @@ public class Query {
 		}
 		
 		//again run query to get number of research result, if there is none, give informative message
-		getMaxOfSearchResult.clearParameters();
-		ResultSet currentSearchResult = getMaxOfSearchResult.executeQuery();
+		getCountOfSearchResult_user.clearParameters();
+		getCountOfSearchResult_user.setInt(1, this.cid);
+		ResultSet currentSearchResult = getCountOfSearchResult_user.executeQuery();
 		
 		int count_SearchResult = 0; // store current number of records in search result table
 		while(currentSearchResult.next()){
@@ -337,6 +359,8 @@ public class Query {
 		if(count_SearchResult == 0){
 			System.out.println("There is no itinerary matching your request, please change the search.");
 		}
+		
+		this.commitTransaction();
 	}
 	/*
 	public void transaction_search_unsafe(String originCity, String destinationCity, boolean directFlight, int dayOfMonth, int numberOfItineraries) throws Exception {
@@ -399,28 +423,32 @@ public class Query {
 		else if(count_ResearchResult_user < 1){
 			System.out.println("You haven't search itineraries after login, please search first.");
 		}
-		else{
-	        int reservation_ID = 0;
-			//obtain information of this itinerary
-			getInfoOfItinerary.clearParameters();
-			getInfoOfItinerary.setInt(1, itineraryId);
-			getInfoOfItinerary.setInt(2, this.cid);//only get searches done by current user
-			ResultSet infoOfItineraryResults = getInfoOfItinerary.executeQuery();
-			
-			//make sure the requested book number is valid
-			getMaxOfSearchResult.clearParameters();
-			ResultSet countOfSearchResult = getMaxOfSearchResult.executeQuery();
+		else{	
+			//make sure the requested book number is valid(query from search result table)
+			getCountOfItinerary.clearParameters();
+			getCountOfItinerary.setInt(1, itineraryId);
+			getCountOfItinerary.setInt(2, this.cid);
+			ResultSet countOfSearchResult = getCountOfItinerary.executeQuery();
 			int count_search_result = 0;
 			while(countOfSearchResult.next()){
 				count_search_result = countOfSearchResult.getInt("ct"); 
 			}
 
-			if(count_search_result < itineraryId){
+			if(count_search_result == 0){
 				System.out.println("Please input valid itineraryId.");
 			}
 			//then get information of given itinerary
 			//get userID from login info
 			else{
+				this.beginTransaction();
+				
+		        int reservation_ID = 0;
+				//obtain information of this itinerary
+				getInfoOfItinerary.clearParameters();
+				getInfoOfItinerary.setInt(1, itineraryId);
+				getInfoOfItinerary.setInt(2, this.cid);//only get searches done by current user
+				ResultSet infoOfItineraryResults = getInfoOfItinerary.executeQuery();
+				
 				int result_userID = this.cid;
 				while(infoOfItineraryResults.next()){
 					int result_year = infoOfItineraryResults.getInt("year");
@@ -458,15 +486,15 @@ public class Query {
 								
 					if(count_Itinerary >= MAX_CAPACITY){
 						System.out.println("All tickets of this flight are booked. Please choose other flight.");
+						this.rollbackTransaction();
 					}		
 					else if(count_User > 0){
 						System.out.println("You have reserved one itinerary on this day.");
+						this.rollbackTransaction();
 					}
 					else{
 						//then begin booking
-//						conn.setAutoCommit(false);
-//						conn.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
-						this.beginTransaction();
+//						this.beginTransaction();
 						
 						//get current number of records in reservation
 						getMaxOfReservationID.clearParameters();
@@ -492,13 +520,11 @@ public class Query {
 						reserveTicket.executeUpdate();
 						
 						this.commitTransaction();
-						this.conn.setAutoCommit(true); 	
+//						this.conn.setAutoCommit(true); 	
 	//					this.cid = -1;
 					}
 				}
 			}
-			infoOfItineraryResults.close();
-			
 		}
 	}
 
@@ -536,6 +562,7 @@ public class Query {
 			System.out.println("Please log in before canceling.");
 		}
 		else{
+			this.beginTransaction();
 			//check if reservationId is valid
 			checkReservation.clearParameters();
 			checkReservation.setInt(1, reservationId);
@@ -548,16 +575,14 @@ public class Query {
 			
 			if(count_ValidRecord != 1){
 				System.out.println("This is not a valid reservationId, please input again.");
+				this.rollbackTransaction();
 			}
 			//then cancel this reservation
 			else{
-				conn.setAutoCommit(false);
-				conn.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
 				deleteReservation.clearParameters();
 				deleteReservation.setInt(1, reservationId);
-				deleteReservation.executeUpdate();				
-				conn.commit();
-				conn.setAutoCommit(true); 	
+				deleteReservation.executeUpdate();
+				this.commitTransaction();
 			}
 		}
 	}
