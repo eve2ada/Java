@@ -23,9 +23,7 @@ public class Query {
 	private String jSQLPassword;
 	
 	private int MAX_CAPACITY = 3; //Each flight have a maximum capacity that must not be exceeded
-//	private int cur_user; //current user ID
-//	private int cur_booked; //currently number of tickets
-//	private int rowID; //row id as itinerary id
+
 
 	// DB Connection
 	private Connection conn;
@@ -408,6 +406,7 @@ public class Query {
         */
 
 	public void transaction_book(int itineraryId) throws Exception {
+//		this.beginTransaction();
 		//check if search result table has this user related records
 		getCountOfSearchResult_user.clearParameters();
 		getCountOfSearchResult_user.setInt(1, this.cid);
@@ -419,9 +418,11 @@ public class Query {
 		
 		if(this.cid == -1){
 			System.out.println("Please log in before booking.");
+//			this.rollbackTransaction();
 		}
 		else if(count_ResearchResult_user < 1){
 			System.out.println("You haven't search itineraries after login, please search first.");
+//			this.rollbackTransaction();
 		}
 		else{	
 			//make sure the requested book number is valid(query from search result table)
@@ -436,11 +437,12 @@ public class Query {
 
 			if(count_search_result == 0){
 				System.out.println("Please input valid itineraryId.");
+				this.rollbackTransaction();
 			}
 			//then get information of given itinerary
 			//get userID from login info
 			else{
-				this.beginTransaction();
+//				this.beginTransaction();
 				
 		        int reservation_ID = 0;
 				//obtain information of this itinerary
@@ -459,6 +461,18 @@ public class Query {
 					String result_originCity = infoOfItineraryResults.getString("origin_city");
 					int result_actualTime = infoOfItineraryResults.getInt("actual_time");
 					
+					//make sure a customer may have at most one reservation for any given day
+					getBookedItinerary.clearParameters();
+					getBookedItinerary.setInt(1, result_userID);
+					getBookedItinerary.setInt(2, result_dayofMonth);
+					ResultSet countOfGivenUser = getBookedItinerary.executeQuery();
+					int count_User = 0;
+					while(countOfGivenUser.next()){
+						count_User = countOfGivenUser.getInt("ct");
+					}
+//					countOfGivenUser.close();
+					
+//					this.beginTransaction();
 					//make sure the max capacity of each flight has not be reached
 					getBookedFlights.clearParameters();
 					getBookedFlights.setInt(1, result_dayofMonth);
@@ -472,18 +486,7 @@ public class Query {
 						count_Itinerary = countOfGivenFlight.getInt("ct");
 					}
 					countOfGivenFlight.close();
-					
-					//make sure a customer may have at most one reservation for any given day
-					getBookedItinerary.clearParameters();
-					getBookedItinerary.setInt(1, result_userID);
-					getBookedItinerary.setInt(2, result_dayofMonth);
-					ResultSet countOfGivenUser = getBookedItinerary.executeQuery();
-					int count_User = 0;
-					while(countOfGivenUser.next()){
-						count_User = countOfGivenUser.getInt("ct");
-					}
-					countOfGivenUser.close();
-								
+										
 					if(count_Itinerary >= MAX_CAPACITY){
 						System.out.println("All tickets of this flight are booked. Please choose other flight.");
 						this.rollbackTransaction();
@@ -504,6 +507,7 @@ public class Query {
 						}
 						countOfReservation.close();
 						
+						this.beginTransaction();
 						//book ticket
 						reserveTicket.clearParameters();
 						reservation_ID ++;
@@ -520,8 +524,6 @@ public class Query {
 						reserveTicket.executeUpdate();
 						
 						this.commitTransaction();
-//						this.conn.setAutoCommit(true); 	
-	//					this.cid = -1;
 					}
 				}
 			}
@@ -601,5 +603,4 @@ public class Query {
         rollbackTransactionStatement.executeUpdate();
         conn.setAutoCommit(true);
         } 
-
 }
