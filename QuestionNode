@@ -1,0 +1,39 @@
+//Yi He
+//12/02/2015
+//CSE 143X
+//TA:Rasika Bhalerao
+//HW #10
+//
+//This is a class that represents a single question and its answers
+
+public class QuestionNode {
+	public String question;
+	public QuestionNode left;
+	public QuestionNode right;
+	
+	public QuestionNode(String question){
+		this.question = question;
+		this.left = null;
+		this.right = null;
+	}
+	
+	public void setLeft(String leftQuestion){
+		this.left.question = leftQuestion;
+	}
+	
+	public void setRight(String rightQuestion){
+		this.right.question = rightQuestion;
+	}
+	
+	public String getLeft(){
+		return this.left.question;
+	}
+	
+	public String getRight(){
+		return this.right.question;
+	}
+	
+	public String toString(){
+		return this.question;
+	}
+}
