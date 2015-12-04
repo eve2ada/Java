@@ -11,17 +11,49 @@ import java.io.*;
 
 public class QuestionsGame {
 	private QuestionNode root;
+	private Scanner console;
 	
 	//constructor to initialize a new QuestionsGame object with a single leaf node
 	//may assume the String is not null.
 	public QuestionsGame(String object){
 		this.root = new QuestionNode(object);
+		this.console = new Scanner(System.in);
 	}
 	
 	//constructor to initialize a new QuestionsGame object by reading from the provided Scanner
 	//containing a tree of questions in standard format
 	public QuestionsGame(Scanner input){
-		//Make sure to read entire lines of input using calls on Scanner’s nextLine.
+		//initialize printout stream
+		this.console = new Scanner(System.in);
+		
+		//initialize question game tree
+		input.nextLine();
+		this.root = new QuestionNode(input.nextLine());
+		this.root.left = this.readTree(input);
+		this.root.right = this.readTree(input);
+	}
+	
+	//helper for QuestionsGame method to read in a tree
+	private QuestionNode readTree(Scanner input){
+		String type = input.nextLine(); //root type
+		String question = input.nextLine(); //root question
+		QuestionNode current = new QuestionNode(question);//new root node
+		
+		if(input.hasNextLine()){
+			if(type.equals("Q:")){
+				current.left = this.readTree(input);	
+			}
+			else if(type.equals("A:")){
+				current.left = null;
+			}
+			if(type.equals("Q:")){
+				current.right = this.readTree(input);
+			}
+			else if(type.equals("A")){
+				current.right = null;
+			}
+		}
+		return current;		
 	}
 	
 	//method to store the current questions tree to an output file represented by the given PrintStream.
@@ -31,12 +63,12 @@ public class QuestionsGame {
 			throw new IllegalArgumentException("output should not be null.");
 		}
 		else{
-			this.writeTree(this.root);
+			this.writeTree(this.root, output);
 		}
 	}
 	
 	//helper for saveQuestions method to save tree to a file
-	private void writeTree(QuestionNode current){
+	private void writeTree(QuestionNode current, PrintStream output){
 		String type = "";
 		if(current != null){
 			if(current.left != null || current.right != null){
@@ -45,15 +77,71 @@ public class QuestionsGame {
 			else{
 				type += "A:";
 			}
-			System.out.println(type + current.question);
-			this.writeTree(current.left);
-			this.writeTree(current.right);
+			output.println(type);
+			output.println(current.question);
+			this.writeTree(current.left, output);
+			this.writeTree(current.right, output);
 		}
 	}
 	
-	//method tp use the current question tree to play one complete guessing game with the user,
+	//method to use the current question tree to play one complete guessing game with the user,
 	//asking yes/no questions until reaching an answer object to guess.
 	public void play(){
-		
+		this.playHelper(this.root);
+	}
+	
+	private void playHelper(QuestionNode current){
+		String answer = "";
+		if(current != null){
+			//if current node is leaf
+			answer = current.question;
+			if(current.left == null && current.right == null){
+				System.out.println("I guess that your object is " + answer + "!");
+				System.out.print("Am I right? (y/n)? ");
+				
+				String temp = console.nextLine().trim().toLowerCase();
+				//guess is right
+				if(temp.startsWith("y")){
+					System.out.println("Awesome! I win! ");
+				}
+				//guess is wrong, then ask user to help improve
+				else if(temp.startsWith("n")){
+					System.out.println("Boo! I Lose.  Please help me get better! ");
+					System.out.print("What is your object? ");
+					temp = console.nextLine();
+					
+					System.out.println("Please give me a yes/no question that "
+							+ "distinguishes between " + temp + " and " + answer + ".");
+					//get question and update current node
+					System.out.print("Q: ");
+					current.question = console.nextLine();
+					System.out.print("Is the answer \"yes\" for " + temp +"? (y/n)? ");
+					String tempYN = console.nextLine().trim().toLowerCase();
+					if(tempYN.startsWith("y")){
+						current.left = new QuestionNode(temp);
+						current.right = new QuestionNode(answer);
+					}
+					else{
+						current.left = new QuestionNode(answer);
+						current.right = new QuestionNode(temp);
+					}
+
+				}
+			}
+			//if current node is not leaf
+			else{
+				System.out.print(current.question + " (y/n)? ");
+				String temp = console.nextLine().trim().toLowerCase();
+//				System.out.println("###########" + temp);
+				//answer is yes
+				if(temp.startsWith("y")){
+					this.playHelper(current.left);
+				}
+				//guess is wrong, then ask user to help improve
+				else{
+					this.playHelper(current.right);
+				}
+			}			
+		}
 	}
 }
