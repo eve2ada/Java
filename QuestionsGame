@@ -1,0 +1,59 @@
+//Yi He
+//12/02/2015
+//CSE 143X
+//TA:Rasika Bhalerao
+//HW #10
+//
+//This is a class that represents a tree of questions and answers
+
+import java.util.*;
+import java.io.*;
+
+public class QuestionsGame {
+	private QuestionNode root;
+	
+	//constructor to initialize a new QuestionsGame object with a single leaf node
+	//may assume the String is not null.
+	public QuestionsGame(String object){
+		this.root = new QuestionNode(object);
+	}
+	
+	//constructor to initialize a new QuestionsGame object by reading from the provided Scanner
+	//containing a tree of questions in standard format
+	public QuestionsGame(Scanner input){
+		//Make sure to read entire lines of input using calls on Scanner’s nextLine.
+	}
+	
+	//method to store the current questions tree to an output file represented by the given PrintStream.
+	public void saveQuestions(PrintStream output){
+		//throw an IllegalArgumentException if the PrintStream is null
+		if(output == null){
+			throw new IllegalArgumentException("output should not be null.");
+		}
+		else{
+			this.writeTree(this.root);
+		}
+	}
+	
+	//helper for saveQuestions method to save tree to a file
+	private void writeTree(QuestionNode current){
+		String type = "";
+		if(current != null){
+			if(current.left != null || current.right != null){
+				type += "Q:";
+			}
+			else{
+				type += "A:";
+			}
+			System.out.println(type + current.question);
+			this.writeTree(current.left);
+			this.writeTree(current.right);
+		}
+	}
+	
+	//method tp use the current question tree to play one complete guessing game with the user,
+	//asking yes/no questions until reaching an answer object to guess.
+	public void play(){
+		
+	}
+}
