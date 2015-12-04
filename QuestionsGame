@@ -49,7 +49,7 @@ public class QuestionsGame {
 			if(type.equals("Q:")){
 				current.right = this.readTree(input);
 			}
-			else if(type.equals("A")){
+			else if(type.equals("A:")){
 				current.right = null;
 			}
 		}
@@ -132,7 +132,6 @@ public class QuestionsGame {
 			else{
 				System.out.print(current.question + " (y/n)? ");
 				String temp = console.nextLine().trim().toLowerCase();
-//				System.out.println("###########" + temp);
 				//answer is yes
 				if(temp.startsWith("y")){
 					this.playHelper(current.left);
