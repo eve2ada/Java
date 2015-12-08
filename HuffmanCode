@@ -1,0 +1,120 @@
+//Yi He
+//12/07/2015
+//CSE 143X
+//TA:Rasika Bhalerao
+//HW #11
+//
+//This is a class representing a “huffman code” which is used to compress data
+
+import java.io.*;
+import java.util.*;
+
+public class HuffmanCode {
+	private PriorityQueue<HuffmanNode> pQueue;
+	private HuffmanNode root;
+	
+	/*initialize a new HuffmanCode object using the algorithm described for 
+	making a code from an array of frequencies.*/
+	/*frequencies is an array of frequencies where frequences[i] is the count 
+	of the character with ASCII value i*/
+	public HuffmanCode(int[] frequencies){
+		for(int i = 0; i < frequencies.length; i ++){
+			this.pQueue.add(new HuffmanNode(frequencies[i],i));
+		}
+		this.generateTree(this.pQueue);
+	}
+	
+	/*initialize a new HuffmanCode object by reading in a previously constructed
+	code from a .code file*/
+	public HuffmanCode(Scanner input){
+		while(input.hasNextLine()){
+			int character = Integer.parseInt(input.nextLine());
+			int freq = Integer.parseInt(input.nextLine());
+			this.pQueue.add(new HuffmanNode(character,freq));
+		}
+		this.generateTree(this.pQueue);
+	}
+	
+	//helper method to generate tree from priority queue
+	private void generateTree(PriorityQueue<HuffmanNode> priorityQueue){
+		while(priorityQueue.size() > 1){
+			//First, remove the smallest two nodes from the priority queue
+			HuffmanNode leftNode = priorityQueue.remove();
+			HuffmanNode rightNode = priorityQueue.remove();
+			//create a new node. The frequency is the sum of two nodes
+			HuffmanNode curParent = new HuffmanNode(-1, leftNode.freq 
+					+ rightNode.freq);
+			curParent.left = leftNode;
+			curParent.right = rightNode;
+			
+			//add new node back to the priority queue
+			priorityQueue.add(curParent);
+		}
+		this.root = priorityQueue.remove();
+	}
+	
+	
+	/*method to store the current huffman codes to the given output stream in 
+	 the standard format described above*/
+	public void save(PrintStream output){
+		this.saveHelper(this.root, "");
+	}
+	
+	private void saveHelper(HuffmanNode cur, String s){
+//		String codesL = "";//to store huffman code of each character
+//		String codesR = "";
+
+		//If current node is a leaf
+		if(cur.left == null && cur.right == null){
+			//print ASCII code of current character
+			System.out.println(cur.character);
+			//then print Huffman codes
+			System.out.println(s);
+		}		
+		else{
+			if(cur.left != null){
+				//add the value 0 or 1 to the end of s
+				s += "0"; 			
+				this.saveHelper(cur.left, s);
+				s = s.substring(0, s.length() - 1);			
+			}
+			if(cur.right != null){
+				s += "1";
+				this.saveHelper(cur.right, s);
+				s = s.substring(0, s.length() - 1);
+			}
+		}
+	}
+	
+	/*method to read individual bits from the input stream and write the 
+	 corresponding characters to the output
+	 It should stop reading when the BitInputStream is empty. */
+	public void translate(BitInputStream input, PrintStream output){
+		this.translateHelper(this.root, input, output);
+	}
+	
+	private void translateHelper(HuffmanNode cur, BitInputStream input, 
+			PrintStream output){
+		if(input.hasNextBit()){
+			int curInt = input.nextBit();
+			if(curInt == 0){
+				cur = cur.left;
+				if(cur.left == null && cur.right == null){
+					output.print(cur.character);
+				}
+				else{
+					this.translateHelper(cur.left, input, output);
+				}
+			}
+			else{
+				cur = cur.right;
+				if(cur.left == null && cur.right == null){
+					output.print(cur.character);
+				}
+				else{
+					this.translateHelper(cur.right, input, output);
+				}
+			}
+		}
+	}
+}
