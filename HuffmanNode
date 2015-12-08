@@ -1,0 +1,32 @@
+//Yi He
+//12/07/2015
+//CSE 143X
+//TA:Rasika Bhalerao
+//HW #11
+//
+//This is a class representing a single piece of a huffman code
+//should not contain any actual huffman coding logic
+
+import java.util.*;
+
+public class HuffmanNode implements Comparable<HuffmanNode>{
+	//fields must be public
+	//Any fields representing data must be final
+	public final int character;
+	public final int freq;
+	public HuffmanNode left;
+	public HuffmanNode right;
+	
+	//constructor of HuffmanNode class
+	public HuffmanNode(int character, int freq){
+		this.character = character;
+		this.freq = freq;
+		this.left = null;
+		this.right = null;
+	}
+	
+	//implement the Comparable<E> interface
+	public int compareTo(HuffmanNode other){
+		return ((Integer) this.freq).compareTo(other.freq);
+	}
+}
