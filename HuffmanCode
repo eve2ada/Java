@@ -160,30 +160,4 @@ public class HuffmanCode {
 			}
 		}
 	}
-	/*
-	private void translateHelper(HuffmanNode cur, BitInputStream input, 
-			PrintStream output){
-		while(input.hasNextBit()){
-			int curInt = input.nextBit();
-			if(curInt == 0){
-				cur = cur.left;
-				if(cur.left == null && cur.right == null){
-					output.write((char)cur.character);
-				}
-				else{
-					this.translateHelper(cur.left, input, output);
-				}
-			}
-			else{
-				output.print((char)cur.character);
-				cur = cur.right;
-				if(cur.left == null && cur.right == null){
-					output.write((char)cur.character);
-				}
-				else{
-					this.translateHelper(cur.right, input, output);
-				}
-			}
-		}
-	}*/
 }
